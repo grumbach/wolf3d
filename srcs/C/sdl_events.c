@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/12 12:49:22 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/21 13:51:36 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/10/21 14:52:48 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,9 @@ static int			sdl_keyboard(t_cam *cam)
 	const Uint8		*state = SDL_GetKeyboardState(NULL);
 
 	if (state[SDL_SCANCODE_W])
-		cam->origin.z -= 0.1;
+		cam->origin.y -= 0.1;
 	if (state[SDL_SCANCODE_S])
-		cam->origin.z += 0.1;
+		cam->origin.y += 0.1;
 	if (state[SDL_SCANCODE_A])
 		cam->origin.x += 0.1;
 	if (state[SDL_SCANCODE_D])
@@ -45,7 +45,6 @@ int					sdl_events(t_sdl *sdl, t_cam *cam)
 			sdl->event.window.event == SDL_WINDOWEVENT_RESIZED)
 		{
 			sdl_init_window(sdl);
-			cam->aspect = sdl->size.x / (float)sdl->size.y;
 			return (EVENT_UPDATE);
 		}
 		if (sdl_keyboard(cam))

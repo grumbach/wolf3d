@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "rt.h"
+#include "wolf3d.h"
 
 long			errors(const int err, const char *comment)
 {

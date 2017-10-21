@@ -18,7 +18,6 @@
 */
 
 # include "vector.h.cl"
-# include "hit.h.cl"
 
 /*
 ** ********************************** camera ***********************************
@@ -29,7 +28,6 @@ typedef struct			s_cam
 	t_vector			origin;
 	t_vector			direction;
 	float				fov;
-	float				aspect;
 }						t_cam;
 
 /*
