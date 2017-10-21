@@ -32,21 +32,7 @@ static void				put_pixel(__global uint* pixels, const int pixel, \
 }
 
 /*
-** modify the color of walls according to the camera direction
-*/
-
-static inline uint_t	getcolor()
-{
-	uint_t color;
-
-	if (cam.direction.y > 0)
-		color = (cam.direction.x > 0) ? WALLPINK: WALLCRIMSONRED;
-	else
-		color = (cam.direction.x > 0) ? WALLSKYBLUE: WALLMIDNIGHTBLUE;
-	return (color);
-}
-
-/*
+** 1) compute ray position and direction
 ** cameraX is x-coordinate in camera space
 ** map represents which box of the map we're in
 ** deltaDist is length of ray from one x or y-side to next x or y-side
@@ -67,7 +53,9 @@ static inline void		compute_rayposdir()
 }
 
 /*
-**  sideDist is length of ray from current position to next x or y-side
+** 2) compute step and sideDist
+** step
+** sideDist is length of ray from current position to next x or y-side
 */
 
 static inline void		compute_step_sideDist()
@@ -98,15 +86,16 @@ static inline void		compute_step_sideDist()
 }
 
 /*
-** step 3 :
-** 2)
-**
+** 3) DDA algo
+** hit is a boolean to check if a wall was hit
+** side is a boolean to check if a North/South or East/West wall was hit
 */
 
 static inline void		dda()
 {
-	int hit = 0; //was there a wall hit?
-	int side; //was a NS or a EW wall hit?
+	int		hit = 0;
+	int		side;
+	float	perpWallDist;
 
 	while (!hit)
 	{
@@ -123,16 +112,57 @@ static inline void		dda()
           map.y += step.y;
           side = 1;
         }
-        //Check if ray has hit a wall
+        // Check if ray has hit a wall
         if (map[map.x][map.y] > 0)
 			hit = 1;
     }
+	perpWallDist = (!side) ? (map.x - rayPos.x + (1 - step.x) / 2) / rayDir.x \
+ 	: (map.y - rayPos.y + (1 - step.y) / 2) / rayDir.y;
+}
+
+/*
+** modify the color of walls according to the camera direction
+*/
+
+static inline uint_t	getcolor()
+{
+	uint_t color;
+
+	if (cam.direction.y > 0)
+		color = (cam.direction.x > 0) ? WALLPINK: WALLCRIMSONRED;
+	else
+		color = (cam.direction.x > 0) ? WALLSKYBLUE: WALLMIDNIGHTBLUE;
+	return (color);
+}
+
+/*
+** lineHeight is the height of the vertical line that should be drawn
+** the start and end position of where we should really draw are calculated.
+** The center of the wall should be at the center of the screen, and if these
+** points lie outside the screen, they're capped to 0 or h-1.
+*/
+
+static void get_wall_height()
+{
+	int lineHeight = (int)(h / perpWallDist);
+	int	drawStart;
+	int	drawEnd;
+
+	drawStart = -lineHeight / 2 + h / 2;
+	drawEnd = lineHeight / 2 + h / 2;
+	if (drawStart < 0)
+		drawStart = 0;
+	if (drawEnd >= h)
+		drawEnd = h - 1;
+	wallcolor[x] = getcolor();
+	verLine(x, drawStart, drawEnd, color);
 }
 
 /*
 ** 1) compute step and sideDist
 ** 2) compute step and sideDist
-** 3) compute dda
+** 3) compute dda and calculate distance to perpendicular wall
+** 4)
 */
 
 __kernel void		core(__constant char *map, __constant t_cam *cam, \
@@ -143,10 +173,10 @@ __kernel void		core(__constant char *map, __constant t_cam *cam, \
 	const char   (*map)[24][24] = map; // replace later 2 value /!/
 	t_vector	cam_plane;
 
-	wallcolor[x] = getcolor();
+
 	compute_rayposdir();
 	compute_step_sideDist();
 	dda();
 	//printf("x : [%d], [%d]\n", x, w);//
-	verLine(x, drawStart, drawEnd, color);
+	get_wall_height()
 }
