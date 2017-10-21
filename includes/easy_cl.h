@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/28 11:54:05 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/21 13:29:06 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/10/21 17:27:24 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,6 @@ void					cl_end(t_cl *cl);
 ** ********************************** errors ***********************************
 */
 
-void					cl_error_log(t_cl *cl, const cl_int error_code);
+int						cl_error_log(t_cl *cl, const cl_int error_code);
 
 #endif

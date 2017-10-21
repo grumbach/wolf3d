@@ -6,27 +6,38 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:52:41 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/21 15:17:54 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/10/21 17:38:02 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "wolf3d.h"
 
+/*
+** cl_run has 4 args
+**     - [r--] the map
+**     - [r--] the camera
+**     - [-w-] wall_heights (written in the first line of pixeltab, for memory efficiency)
+**     - [-w-] wall_colors (written in the middle of pixeltab, as they won't need to change color...)
+*/
+
 static void	main_loop(t_cl *cl, t_sdl *sdl)
 {
 	t_cam		cam;
-	t_vector	col_hei;
 	int			loop;
 
-	cam = (t_cam){(t_vector){0, 0}, (t_vector){0, 0}, 42};
+	cam = (t_cam){(t_vector){22, 12}, (t_vector){-1, 0}, (t_vector){0, 0.66}};
 	loop = EVENT_UPDATE;
 	while (loop)
 	{
 		if (loop == EVENT_UPDATE)
 		{
-			cl_run(cl, (size_t[WORK_DIM]){sdl->size.x}, 2, \
+			ft_printf("C  %lu\n", sizeof(t_cam));
+			cl_run(cl, (size_t[WORK_DIM]){sdl->size.x}, 3, \
 				(t_arg){&cam, sizeof(t_cam), CL_MEM_READ_ONLY}, \
-				(t_arg){&col_hei, sizeof(t_vector), CL_MEM_WRITE_ONLY});
+				(t_arg){sdl->pixels, sizeof(uint) * sdl->size.x, CL_MEM_WRITE_ONLY}, \
+				(t_arg){(sdl->pixels + (((sdl->size.y % 2 ? \
+					sdl->size.y - 1 : sdl->size.y) / 2) * sdl->size.x)), \
+					sizeof(uint) * sdl->size.x, CL_MEM_WRITE_ONLY});
 			sdl_run(sdl);
 		}
 		loop = sdl_events(sdl, &cam);
@@ -35,8 +46,33 @@ static void	main_loop(t_cl *cl, t_sdl *sdl)
 
 int			main(void)
 {
-	char		map[2][2] = {{0, 1}, {0, 0}};
-
+	char	map[MAP_H][MAP_W] =
+	{
+		{1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1},
+		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,2,2,2,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
+		{1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,3,0,0,0,3,0,0,0,1},
+		{1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,4,0,0,0,0,5,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,4,0,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+	};
 
 	t_cl	cl;
 	t_sdl	sdl;
@@ -44,7 +80,7 @@ int			main(void)
 	ft_bzero(&cl, sizeof(cl));
 	ft_bzero(&sdl, sizeof(sdl));
 
-	cl_init(&cl, 1, (t_arg){map, 4, CL_MEM_READ_ONLY});
+	cl_init(&cl, 1, (t_arg){map, sizeof(map), CL_MEM_READ_ONLY});
 	sdl_init(&sdl, PROGRAM_NAME);
 
 	main_loop(&cl, &sdl);

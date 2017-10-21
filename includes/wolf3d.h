@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:53:40 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/21 15:17:38 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/10/21 17:36:18 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@
 
 # define WIN_H				640
 # define WIN_W				1024
+# define MAP_H				24
+# define MAP_W				24
 
 /*
 ** ********************************** errors ***********************************
@@ -66,8 +68,7 @@ typedef struct			s_cam
 {
 	t_vector			origin;
 	t_vector			direction;
-	float				fov;
-	uint32_t : 32;
+	t_vector			plane;
 }						t_cam;
 
 int						sdl_events(t_sdl *sdl, t_cam *cam);

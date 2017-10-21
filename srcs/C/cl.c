@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/21 02:25:45 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/21 13:51:12 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/10/21 17:27:31 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,7 @@ static inline void	cl_init_program(t_cl *cl, const int nb_const)
 		(const char **)&source_str_ptr, (const size_t *)&source_size, &ret);
 	ret ? errors(ERR_CL, "clCreateProgramWithSource failure --") : 0;
 	ret = clBuildProgram(cl->program, 1, &cl->device_id, CL_CC_FLAGS, 0, 0);
-	ret ? cl_error_log(cl, ret) : 0;
-	ret ? errors(ERR_CL, "clBuildProgram failure --") : 0;
+	ret ? errors(cl_error_log(cl, ret), "clBuildProgram failure --") : 0;
 	cl->kernel = clCreateKernel(cl->program, CL_KERNEL_NAME, &ret);
 	ret ? errors(ERR_CL, "clCreateKernel failure --") : 0;
 	cl->nb_const = nb_const;
@@ -117,9 +116,9 @@ void				cl_run(t_cl *cl, size_t work_size[WORK_DIM], \
 		arg[i] = va_arg(ap, t_arg);
 	va_end(ap);
 	cl_run_args(cl, arg, nb_arg);
-	if (clEnqueueNDRangeKernel(cl->command_queue, cl->kernel, WORK_DIM, NULL, \
-		work_size, NULL, 0, NULL, NULL))
-		errors(ERR_CL, "clEnqueueNDRangeKernel failure --");
+	if ((i = clEnqueueNDRangeKernel(cl->command_queue, cl->kernel, WORK_DIM, NULL, \
+		work_size, NULL, 0, NULL, NULL)))
+		errors(cl_error_log(cl, i), "clEnqueueNDRangeKernel failure --");
 	if (clFinish(cl->command_queue))
 		errors(ERR_CL, "clFinish failure --");
 	i = cl->nb_const - 1;
