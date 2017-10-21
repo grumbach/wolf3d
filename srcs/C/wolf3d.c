@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:52:41 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/21 17:38:02 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/10/21 20:05:13 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,49 @@
 **     - [-w-] wall_colors (written in the middle of pixeltab, as they won't need to change color...)
 */
 
+static void	put_pixel(t_sdl *sdl, const t_yx i, uint color)
+{
+	sdl->pixels[sdl->size.x * i.y + i.x] = color;// TODO change this to sexy pointer
+}
+
+/*
+** -----------------------------------------  win size -> UP
+**       -----------------------------        wallheight
+** ++++++                             ++++++  diff
+** ======                                     GROUND
+**       =============================        WALL
+** 	                                  ======  SKYBOX
+*/
+
+static void	map_redraw(t_sdl *sdl)
+{
+	t_yx		i;
+	uint		wall_color;
+	int			height;
+	int			step;
+
+	i = (t_yx){sdl->size.y, sdl->size.x};
+	while (i.x--)
+	{
+		i.y = sdl->size.y;
+		wall_color = *(sdl->pixels + (((sdl->size.y % 2 ? \
+			sdl->size.y - 1 : sdl->size.y) / 2) * sdl->size.x));
+		height = sdl->pixels[i.x];
+		if (height > sdl->size.y) {ft_printf("OUT OF BOUNDS height TOO HIGH!!"); break;}//
+
+		step = sdl->size.y - ((sdl->size.y - height) / 2);
+		while (--i.y > step)
+			put_pixel(sdl, i, GROUND);
+		step = sdl->size.y - height - ((sdl->size.y - height) / 2);
+		i.y++;
+		while (--i.y > step)
+			put_pixel(sdl, i, wall_color);
+		i.y++;
+		while (--i.y >= 0)
+			put_pixel(sdl, i, SKYBOX);
+	}
+}
+
 static void	main_loop(t_cl *cl, t_sdl *sdl)
 {
 	t_cam		cam;
@@ -31,13 +74,13 @@ static void	main_loop(t_cl *cl, t_sdl *sdl)
 	{
 		if (loop == EVENT_UPDATE)
 		{
-			ft_printf("C  %lu\n", sizeof(t_cam));
 			cl_run(cl, (size_t[WORK_DIM]){sdl->size.x}, 3, \
 				(t_arg){&cam, sizeof(t_cam), CL_MEM_READ_ONLY}, \
 				(t_arg){sdl->pixels, sizeof(uint) * sdl->size.x, CL_MEM_WRITE_ONLY}, \
 				(t_arg){(sdl->pixels + (((sdl->size.y % 2 ? \
 					sdl->size.y - 1 : sdl->size.y) / 2) * sdl->size.x)), \
 					sizeof(uint) * sdl->size.x, CL_MEM_WRITE_ONLY});
+			map_redraw(sdl);
 			sdl_run(sdl);
 		}
 		loop = sdl_events(sdl, &cam);

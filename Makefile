@@ -6,7 +6,7 @@
 #    By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/05/25 11:36:26 by agrumbac          #+#    #+#              #
-#    Updated: 2017/10/21 13:26:40 by agrumbac         ###   ########.fr        #
+#    Updated: 2017/10/21 18:45:00 by agrumbac         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -114,9 +114,9 @@ art:
 	@echo "                           /  : TP._;"
 	@echo "                          / _.;  :Tb|         "${BR}"W"${BY}"O"${BG}"L"${BM}"F"${BB}" 3D "${KR}"!"${X}${BB}
 	@echo "                         /   /   ;"${BW}"j"${BB}"S"${BW}"j"${BB}"        /"
-	@echo "                     _.-\"       dSSSS"
+	@echo "                     _.-\"       "${BW}"d"${BB}"SSS"${BW}"S"${BB}
 	@echo "                   .' ..       "${BW}"d"${BB}"SSSS"${BW}";"${BB}
-	@echo "                  /  /"${KR}"P"${X}${BB}"'      dSSSSP. "${BW}"|\\" ${BB}
+	@echo "                  /  /"${KR}"P"${X}${BB}"'      "${BW}"d"${BB}"SSSSP. "${BW}"|\\" ${BB}
 	@echo "                 /   \"      ."${BW}"d"${BB}"SSSP' "${BW}"|\\" ${BB}"^\"l"
 	@echo "               .'           \`TSP"${BW}"^"${BB}"\"\"\"\"\"  :"
 	@echo "           ._.'      _.'                ;"
