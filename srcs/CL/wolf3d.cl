@@ -20,11 +20,11 @@
 // les murs doivent etre de couleur differente en fonction de la direction
 // pour chaque x on envoie la couleur
 
-#define NOCOLOR				0x000000
-#define WALLMIDNIGHTBLUE	0x191970
-#define WALLSKYBLUE			0x51bdff
-#define WALLPINK			0xa90e64
-#define WALLCRIMSONRED		0xb00718
+#define NOCOLOR				0xff000000
+#define WALLMIDNIGHTBLUE	0xff191970
+#define WALLSKYBLUE			0xff51bdff
+#define WALLPINK			0xffa90e64
+#define WALLCRIMSONRED		0xffb00718
 #define SCREEN_HEIGHT		640
 
 /*
@@ -33,16 +33,6 @@
 ** map represents which box of the map we're in
 ** deltaDist is length of ray from one x or y-side to next x or y-side
 */
-static inline void		compute_rayposdir(__constant t_cam *cam, const int x, \
-	const int w, t_vector rayDir, t_vector deltaDist)
-{
-	const double	cameraX = 2 * x / double(w) - 1;
-
-	rayDir.x = cam->direction.x + cam->plane.x * cameraX;
-	rayDir.y = cam->direction.y + cam->plane.y * cameraX; // 0.66 plane Y
-	deltaDist.x = sqrt(1 + (rayDir.y * rayDir.y) / (rayDir.x * rayDir.x));
-    deltaDist.y = sqrt(1 + (rayDir.x * rayDir.x) / (rayDir.y * rayDir.y));
-}
 
 /*
 ** 2) compute step and sideDist
@@ -50,33 +40,7 @@ static inline void		compute_rayposdir(__constant t_cam *cam, const int x, \
 ** sideDist is length of ray from current position to next x or y-side
 */
 
-static inline void		compute_step_sideDist(t_vector rayDir, t_vector rayPos \
-	, t_vector deltaDist, t_vector step, t_vector sideDist, t_vector map)
-{
-	map.x = (int)rayPos.x;
-	map.y = (int)rayPos.y;
-	if (rayDir.x < 0)
-	{
-		step.x = -1;
-		sideDist.x = (rayPos.x - map.x) * deltaDist.x;
-	}
-	else
-	{
-	   step.x = 1;
-	   sideDist.x = (map.x + 1.0 - rayPos.x) * deltaDist.x;
-	}
-	if (rayDir.y < 0)
-	{
-		   step.y = -1;
-		   sideDist.y = (rayPos.y - map.y) * deltaDist.y;
-	}
-	else
-	{
-		step.y = 1;
-		sideDist.y = (map.y + 1.0 - rayPos.y) * deltaDist.y;
-	}
 
-}
 
 /*
 ** 3) DDA algo
@@ -128,38 +92,6 @@ static inline uint getcolor(t_vector direction)
 
 }
 
-static inline void verLine(int x, int y1, int y2, uint color)
-{
-
-}
-
-/*
-** lineHeight is the height of the vertical line that should be drawn
-** the start and end position of where we should really draw are calculated.
-** The center of the wall should be at the center of the screen, and if these
-** points lie outside the screen, they're capped to 0 or h-1.
-*/
-
-static inline void 		get_wall_height(const int lineHeight, \
-	float perpWallDist, t_vector direction, const int x)
-{
-	int			drawStart;
-	int			drawEnd;
-	uint		color;
-
-	drawStart = -lineHeight / 2 + SCREEN_HEIGHT / 2;
-	drawEnd = lineHeight / 2 + SCREEN_HEIGHT / 2;
-	if (drawStart < 0)
-		drawStart = 0;
-		// replace if with: drawStart = (1 - (DrawStart >> 31)) * DrawStart;
-	if (drawEnd >= SCREEN_HEIGHT)
-		drawEnd = SCREEN_HEIGHT - 1;
-	color = getcolor(direction);
-//	wallcolor[x] = getcolor();
-	verLine(x, drawStart, drawEnd, color);
-//	pixels[index] = color;
-}
-
 /*
 ** 1) compute step and sideDist
 ** 2) compute step and sideDist
@@ -167,23 +99,84 @@ static inline void 		get_wall_height(const int lineHeight, \
 ** 4)
 */
 //
+
+
+static t_vector getDeltaDist(t_vector rayDir)
+{
+	float tmp;
+
+	tmp = (rayDir.y * rayDir.y) / (rayDir.x * rayDir.x);
+	rayDir.x = sqrt(1 + tmp);
+	rayDir.y = sqrt(1 + 1.0f / tmp);
+	return (rayDir);
+}
+
 __kernel void		core(__constant char *map, __constant t_cam *cam, \
 					__global uint *wall_height, __global uint *wall_color)
 {
 	const int 		x = get_global_id(0);
 	const int 		w = get_global_size(0);
+
+	//compute_rayposdir(cam, x, w, rayDir, deltaDist);
+	const double	cameraX = 2 * x / double(w) - 1;
+
+
+//	printf("cam->direction.x : %f  .y: %f\n cam->origin.x : %f  .y : %f\n", cam->direction.x, cam->direction.y, cam->origin.x, cam->origin.y);//
+
+
+//	printf("cameraX : [%d] : \n", cameraX);//
+	t_vector		plane;
 	t_vector		rayDir;
+	t_vector		deltaDist;
+
+	plane.x = 0;
+	plane.y = 0.66;
+	rayDir.x = cam->direction.x + plane.x * cameraX;
+	rayDir.y = cam->direction.y + plane.y * cameraX; // 0.66 plane Y
+//	printf("rayDir.x : %f  rayDir.y : %f\n", rayDir..x, rayDir.y);//
+	deltaDist = getDeltaDist(rayDir);
+
+	//compute_step_sideDist(rayDir, rayPos, deltaDist, step, sideDist, map_pos);
 	const t_vector	rayPos = cam->origin;
-    t_vector		deltaDist;
 	t_vector		step;
 	t_vector		sideDist;
 	t_vector		map_pos;
-	float			perpWallDist;
 
-	compute_rayposdir(cam, x, w, rayDir, deltaDist);
-	compute_step_sideDist(rayDir, rayPos, deltaDist, step, sideDist, map_pos);
-	printf("step.x : [%d]\n", step.x);//
+	map_pos.x = (int)rayPos.x;
+	map_pos.y = (int)rayPos.y;
+	if (rayDir.x < 0)
+	{
+		step.x = -1;
+		sideDist.x = (rayPos.x - map_pos.x) * deltaDist.x;
+	}
+	else
+	{
+		step.x = 1;
+		sideDist.x = (map_pos.x + 1.0 - rayPos.x) * deltaDist.x;
+	}
+	if (rayDir.y < 0)
+	{
+		step.y = -1;
+		sideDist.y = (rayPos.y - map_pos.y) * deltaDist.y;
+	}
+	else
+	{
+		step.y = 1;
+		sideDist.y = (map_pos.y + 1.0 - rayPos.y) * deltaDist.y;
+	}
+
+//printf("sideDist.x : [%d]      sideDist.y : [%d]\n", sideDist.x, sideDist.y);//
+
+
+//	printf("step.x : [%d]\n", step.x);//
+	float			perpWallDist;
 	perpWallDist = dda(step, sideDist, map_pos, deltaDist, map, rayDir, rayPos);
+	//printf("PerpWallDist : [%d]\n", x, perpWallDist);//
 	//printf("x : [%d], [%d]\n", x, w);//
-	get_wall_height((int)(SCREEN_HEIGHT / perpWallDist), perpWallDist, cam->direction, x);
+	//printf("\n\n\n\n\n\n");//
+
+	//send result
+	wall_height[x] = (uint)(SCREEN_HEIGHT / perpWallDist);
+	printf("height : [%d]\n", wall_height[x]);//
+	wall_color[x] = 0xffff55ff;//getcolor(cam->direction);
 }
