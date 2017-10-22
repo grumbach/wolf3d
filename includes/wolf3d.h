@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:53:40 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/21 22:27:45 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/10/22 13:17:32 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,8 @@
 # define MAP_H				24
 # define MAP_W				24
 
-# define SKYBOX				0x44ffffff
-# define GROUND				0x44775500
+# define SKYBOX				0xff333333
+# define GROUND				0xff666666
 
 /*
 ** ********************************** errors ***********************************
@@ -71,7 +71,8 @@ typedef struct			s_cam
 {
 	t_vector			origin;
 	t_vector			direction;
-	t_vector			plane;
+	uint				fov;
+	uint				screen_height;
 }						t_cam;
 
 int						sdl_events(t_sdl *sdl, t_cam *cam);

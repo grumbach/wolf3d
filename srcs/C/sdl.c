@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/21 15:24:34 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/21 13:51:25 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/10/22 13:35:57 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,13 @@ void				sdl_init(t_sdl *sdl, const char *window_name)
 		errors(ERR_SDL, "SDL_CreateWindow failed --");
 	SDL_SetWindowMinimumSize(sdl->window, WIN_W, WIN_H);
 	sdl_init_window(sdl);
+	SDL_WarpMouseInWindow(sdl->window, sdl->size.x / 2, sdl->size.y / 2);
+	SDL_ShowCursor(SDL_DISABLE);
 }
 
 void				sdl_run(t_sdl *sdl)
 {
+	SDL_WarpMouseInWindow(sdl->window, sdl->size.x / 2, sdl->size.y / 2);
 	if (SDL_BlitSurface(sdl->draw_surface, NULL, sdl->screen, NULL))
 		errors(ERR_SDL, "SDL_BlitSurface failed --");
 	if (SDL_UpdateWindowSurface(sdl->window))

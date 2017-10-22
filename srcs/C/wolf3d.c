@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:52:41 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/21 22:52:55 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/10/22 14:10:48 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ static void	main_loop(t_cl *cl, t_sdl *sdl)
 	t_cam		cam;
 	int			loop;
 
-	cam = (t_cam){(t_vector){22, 12}, (t_vector){-1, 0}, (t_vector){0, 0.66}};
+	cam = (t_cam){(t_vector){22, 12}, (t_vector){-1, 0}, 66, sdl->size.y};
 	loop = EVENT_UPDATE;
 	while (loop)
 	{
@@ -69,6 +69,11 @@ static void	main_loop(t_cl *cl, t_sdl *sdl)
 				(t_arg){(sdl->pixels + (((sdl->size.y % 2 ? \
 					sdl->size.y - 1 : sdl->size.y) / 2) * sdl->size.x)), \
 					sizeof(uint) * sdl->size.x, CL_MEM_WRITE_ONLY});
+
+
+			sdl->pixels[42] = 126;
+
+
 			map_redraw(sdl);
 			sdl_run(sdl);
 		}

@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/12 12:49:22 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/21 14:52:48 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/10/22 14:11:06 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,34 @@ static int			sdl_keyboard(t_cam *cam)
 	return (0);
 }
 
+static int			sdl_mouse(t_sdl *sdl, t_cam *cam)
+{
+	int				x;
+	int				dx;
+	float			oldy;
+
+	SDL_GetMouseState(&x, NULL);
+	dx = (sdl->size.x / 2) - x;
+	oldy = cam->direction.y;
+	if (x > 0)
+	{
+		cam->direction = (t_vector)
+		{
+			cam->direction.x * sin(-dx) + oldy * cos(-dx),
+			cam->direction.x * cos(-dx) - oldy * sin(-dx)
+		};
+	}
+	else
+	{
+		cam->direction = (t_vector)
+		{
+			cam->direction.x * sin(dx) + oldy * cos(dx),
+			cam->direction.x * cos(dx) - oldy * sin(dx)
+		};
+	}
+	return (EVENT_UPDATE);
+}
+
 int					sdl_events(t_sdl *sdl, t_cam *cam)
 {
 	if (!(SDL_WaitEvent(&sdl->event)))
@@ -49,11 +77,9 @@ int					sdl_events(t_sdl *sdl, t_cam *cam)
 		}
 		if (sdl_keyboard(cam))
 			return (EVENT_UPDATE);
+		if (sdl->event.type == SDL_MOUSEMOTION)
+			return (sdl_mouse(sdl, cam));
+		SDL_WarpMouseInWindow(sdl->window, sdl->size.x / 2, sdl->size.y / 2);
 	}
 	return (EVENT_IDLE);
 }
-
-// SDL_GetMouseState(&x, &y);
-// SDL_WarpMouseInWindow(env->win, env->ar.win_w >> 1, env->ar.win_h >> 1);
-// SDL_ShowCursor(SDL_DISABLE);
-// SDL_ShowCursor(SDL_ENABLE);
