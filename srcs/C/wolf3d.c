@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:52:41 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/22 14:10:48 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/10/22 19:06:01 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,7 @@ static void	map_redraw(t_sdl *sdl)
 		i.y = sdl->size.y;
 		wall_color = (*pixels)\
 			[((sdl->size.y % 2 ? sdl->size.y - 1 : sdl->size.y) / 2)][i.x];
-		height = (*pixels)[0][i.x];
-		if (height > sdl->size.y) {ft_printf("OUT OF BOUNDS height TOO HIGH!!"); break;}//rm line
+		height = (*pixels)[0][i.x] > (uint)sdl->size.y ? sdl->size.y : (*pixels)[0][i.x];
 		step = sdl->size.y - ((sdl->size.y - height) / 2);
 		while (--i.y > step)
 			(*pixels)[i.y][i.x] = GROUND;
@@ -69,11 +68,6 @@ static void	main_loop(t_cl *cl, t_sdl *sdl)
 				(t_arg){(sdl->pixels + (((sdl->size.y % 2 ? \
 					sdl->size.y - 1 : sdl->size.y) / 2) * sdl->size.x)), \
 					sizeof(uint) * sdl->size.x, CL_MEM_WRITE_ONLY});
-
-
-			sdl->pixels[42] = 126;
-
-
 			map_redraw(sdl);
 			sdl_run(sdl);
 		}

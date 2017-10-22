@@ -6,56 +6,61 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/12 12:49:22 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/22 14:11:06 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/10/22 18:59:42 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "easy_sdl.h"
 #include "wolf3d.h"
 
+static void			turn_cam(t_cam *cam, const float speed)
+{
+	const float		oldy = cam->direction.y;
+
+	cam->direction = (t_vector)
+	{
+		cam->direction.x * sin(speed) + oldy * cos(speed),
+		cam->direction.x * cos(speed) - oldy * sin(speed)
+	};
+}
+
 static int			sdl_keyboard(t_cam *cam)
 {
 	const Uint8		*state = SDL_GetKeyboardState(NULL);
+	t_vector		move;
 
 	if (state[SDL_SCANCODE_W])
-		cam->origin.y -= 0.1;
+		move = (t_vector)
+		{
+			cam->direction.y * MOVE_SPEED,
+			cam->direction.x * MOVE_SPEED
+		};
 	if (state[SDL_SCANCODE_S])
-		cam->origin.y += 0.1;
+		move = (t_vector)
+		{
+			cam->direction.y * -MOVE_SPEED,
+			cam->direction.x * -MOVE_SPEED
+		};
+	cam->origin.x += move.x;
+	cam->origin.y += move.y;
 	if (state[SDL_SCANCODE_A])
-		cam->origin.x += 0.1;
+		turn_cam(cam, -TURN_SPEED);
 	if (state[SDL_SCANCODE_D])
-		cam->origin.x -= 0.1;
-	if (state[SDL_SCANCODE_S] || state[SDL_SCANCODE_W] || \
-		state[SDL_SCANCODE_A] || state[SDL_SCANCODE_D])
-		return (1);
-	return (0);
+		turn_cam(cam, TURN_SPEED);
+	return (state[SDL_SCANCODE_S] || state[SDL_SCANCODE_W] || \
+		state[SDL_SCANCODE_A] || state[SDL_SCANCODE_D]);
 }
 
 static int			sdl_mouse(t_sdl *sdl, t_cam *cam)
 {
 	int				x;
-	int				dx;
-	float			oldy;
 
 	SDL_GetMouseState(&x, NULL);
-	dx = (sdl->size.x / 2) - x;
-	oldy = cam->direction.y;
+	x -= sdl->size.x / 2;
 	if (x > 0)
-	{
-		cam->direction = (t_vector)
-		{
-			cam->direction.x * sin(-dx) + oldy * cos(-dx),
-			cam->direction.x * cos(-dx) - oldy * sin(-dx)
-		};
-	}
+		turn_cam(cam, x * TURN_SPEED / (float)42);
 	else
-	{
-		cam->direction = (t_vector)
-		{
-			cam->direction.x * sin(dx) + oldy * cos(dx),
-			cam->direction.x * cos(dx) - oldy * sin(dx)
-		};
-	}
+		turn_cam(cam, x * TURN_SPEED / (float)42);
 	return (EVENT_UPDATE);
 }
 
