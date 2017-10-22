@@ -27,7 +27,7 @@ typedef struct			s_cam
 {
 	t_vector			origin;
 	t_vector			direction;
-	float				fov;
+	t_vector			plane;
 }						t_cam;
 
 /*
