@@ -13,34 +13,12 @@
 # include "wolf3d.h.cl"
 # include "vector.cl"
 
-// map tableau 2x2 ...
-// camera dans le.h
-// col_hei tableau de deux cases dans laquelle on a la couleur [0] et
-// hauteur [1]
-// les murs doivent etre de couleur differente en fonction de la direction
-// pour chaque x on envoie la couleur
-
 #define NOCOLOR				0xff000000
 #define WALLMIDNIGHTBLUE	0xff191970
 #define WALLSKYBLUE			0xff51bdff
 #define WALLPINK			0xffa90e64
 #define WALLCRIMSONRED		0xffb00718
 #define SCREEN_HEIGHT		640
-
-/*
-** 1) compute ray position and direction
-** cameraX is x-coordinate in camera space
-** map represents which box of the map we're in
-** deltaDist is length of ray from one x or y-side to next x or y-side
-*/
-
-/*
-** 2) compute step and sideDist
-** step
-** sideDist is length of ray from current position to next x or y-side
-*/
-
-
 
 /*
 ** 3) DDA algo
@@ -86,19 +64,12 @@ static inline float		dda(t_vector step, t_vector sideDist, t_vector map_pos,
 
 static inline uint getcolor(t_vector direction)
 {
+	printf("%d\n", direction.y);//
 	if (direction.y > 0)
 		return ((direction.x > 0) ? WALLPINK: WALLCRIMSONRED);
 	return ((direction.x > 0) ? WALLSKYBLUE: WALLMIDNIGHTBLUE);
 
 }
-
-/*
-** 1) compute step and sideDist
-** 2) compute step and sideDist
-** 3) compute dda and calculate distance to perpendicular wall
-** 4)
-*/
-
 
 static t_vector get_step_sideDist(t_vector map_pos, t_vector *step, \
 	t_vector rayPos, t_vector rayDir, t_vector deltaDist)
@@ -128,7 +99,6 @@ static t_vector get_step_sideDist(t_vector map_pos, t_vector *step, \
 	return (sideDist);
 }
 
-
 static t_vector getDeltaDist(t_vector rayDir)
 {
 	float tmp;
@@ -139,19 +109,21 @@ static t_vector getDeltaDist(t_vector rayDir)
 	return (rayDir);
 }
 
+/*
+** 1) compute ray position and direction
+** cameraX is x-coordinate in camera space
+** map represents which box of the map we're in
+** deltaDist is length of ray from one x or y-side to next x or y-side
+** sideDist is length of ray from current position to next x or y-side
+*/
+
 __kernel void		core(__constant char *map, __constant t_cam *cam, \
 					__global uint *wall_height, __global uint *wall_color)
 {
 	const int 		x = get_global_id(0);
 	const int 		w = get_global_size(0);
-
-	//compute_rayposdir(cam, x, w, rayDir, deltaDist);
 	const double	cameraX = 2 * x / double(w) - 1;
-
-
 //	printf("cam->direction.x : %f  .y: %f\n cam->origin.x : %f  .y : %f\n", cam->direction.x, cam->direction.y, cam->origin.x, cam->origin.y);//
-
-
 //	printf("cameraX : [%d] : \n", cameraX);//
 	t_vector		plane;
 	t_vector		rayDir;
@@ -170,21 +142,13 @@ __kernel void		core(__constant char *map, __constant t_cam *cam, \
 	map_pos.x = (int)rayPos.x;
 	map_pos.y = (int)rayPos.y;
 	sideDist = get_step_sideDist(map_pos, &step, rayPos, rayDir, deltaDist);
-
 //printf("sideDist.x : [%d]      sideDist.y : [%d]\n", sideDist.x, sideDist.y);//
-
-
 //	printf("step.x : [%d]\n", step.x);//
-	float			perpWallDist;
-	perpWallDist = dda(step, sideDist, map_pos, deltaDist, map, rayDir, \
-		rayPos);
-
 	//printf("PerpWallDist : [%d]\n", x, perpWallDist);//
 	//printf("x : [%d], [%d]\n", x, w);//
 	//printf("\n\n\n\n\n\n");//
-
-	//send result
-	wall_height[x] = (uint)(SCREEN_HEIGHT / perpWallDist);
+	wall_height[x] = (uint)(SCREEN_HEIGHT /
+		dda(step, sideDist, map_pos, deltaDist, map, rayDir, rayPos));
 //	printf("height : [%d]\n", wall_height[x]);//
 	wall_color[x] = getcolor(cam->direction);
 }
