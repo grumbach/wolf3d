@@ -98,7 +98,35 @@ static inline uint getcolor(t_vector direction)
 ** 3) compute dda and calculate distance to perpendicular wall
 ** 4)
 */
-//
+
+
+static t_vector get_step_sideDist(t_vector map_pos, t_vector *step, \
+	t_vector rayPos, t_vector rayDir, t_vector deltaDist)
+{
+	t_vector		sideDist;
+
+	if (rayDir.x < 0)
+	{
+		step->x = -1;
+		sideDist.x = (rayPos.x - map_pos.x) * deltaDist.x;
+	}
+	else
+	{
+		step->x = 1;
+		sideDist.x = (map_pos.x + 1.0 - rayPos.x) * deltaDist.x;
+	}
+	if (rayDir.y < 0)
+	{
+		step->y = -1;
+		sideDist.y = (rayPos.y - map_pos.y) * deltaDist.y;
+	}
+	else
+	{
+		step->y = 1;
+		sideDist.y = (map_pos.y + 1.0 - rayPos.y) * deltaDist.y;
+	}
+	return (sideDist);
+}
 
 
 static t_vector getDeltaDist(t_vector rayDir)
@@ -128,6 +156,9 @@ __kernel void		core(__constant char *map, __constant t_cam *cam, \
 	t_vector		plane;
 	t_vector		rayDir;
 	t_vector		deltaDist;
+	t_vector		sideDist;
+	t_vector		step;
+	t_vector		map_pos;
 
 	plane.x = 0;
 	plane.y = 0.66;
@@ -135,48 +166,25 @@ __kernel void		core(__constant char *map, __constant t_cam *cam, \
 	rayDir.y = cam->direction.y + plane.y * cameraX; // 0.66 plane Y
 //	printf("rayDir.x : %f  rayDir.y : %f\n", rayDir..x, rayDir.y);//
 	deltaDist = getDeltaDist(rayDir);
-
-	//compute_step_sideDist(rayDir, rayPos, deltaDist, step, sideDist, map_pos);
 	const t_vector	rayPos = cam->origin;
-	t_vector		step;
-	t_vector		sideDist;
-	t_vector		map_pos;
-
 	map_pos.x = (int)rayPos.x;
 	map_pos.y = (int)rayPos.y;
-	if (rayDir.x < 0)
-	{
-		step.x = -1;
-		sideDist.x = (rayPos.x - map_pos.x) * deltaDist.x;
-	}
-	else
-	{
-		step.x = 1;
-		sideDist.x = (map_pos.x + 1.0 - rayPos.x) * deltaDist.x;
-	}
-	if (rayDir.y < 0)
-	{
-		step.y = -1;
-		sideDist.y = (rayPos.y - map_pos.y) * deltaDist.y;
-	}
-	else
-	{
-		step.y = 1;
-		sideDist.y = (map_pos.y + 1.0 - rayPos.y) * deltaDist.y;
-	}
+	sideDist = get_step_sideDist(map_pos, &step, rayPos, rayDir, deltaDist);
 
 //printf("sideDist.x : [%d]      sideDist.y : [%d]\n", sideDist.x, sideDist.y);//
 
 
 //	printf("step.x : [%d]\n", step.x);//
 	float			perpWallDist;
-	perpWallDist = dda(step, sideDist, map_pos, deltaDist, map, rayDir, rayPos);
+	perpWallDist = dda(step, sideDist, map_pos, deltaDist, map, rayDir, \
+		rayPos);
+
 	//printf("PerpWallDist : [%d]\n", x, perpWallDist);//
 	//printf("x : [%d], [%d]\n", x, w);//
 	//printf("\n\n\n\n\n\n");//
 
 	//send result
 	wall_height[x] = (uint)(SCREEN_HEIGHT / perpWallDist);
-	printf("height : [%d]\n", wall_height[x]);//
-	wall_color[x] = 0xffff55ff;//getcolor(cam->direction);
+//	printf("height : [%d]\n", wall_height[x]);//
+	wall_color[x] = getcolor(cam->direction);
 }
