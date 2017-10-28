@@ -1,17 +1,18 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   rt.h.cl                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/06/18 23:53:40 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/06/27 22:00:32 by agrumbac         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
-#ifndef RT_H_CL
-# define RT_H_CL
+#ifndef WOLF3D_H_CL
+# define WOLF3D_H_CL
+
+/*
+** ********************************** typedefs *********************************
+*/
+
+typedef float2			t_vector;
+
+typedef struct			s_xy
+{
+	int					x;
+	int					y;
+}						t_xy;
 
 /*
 ** ********************************** camera ***********************************
@@ -39,16 +40,5 @@ typedef struct			s_cam
 # define WALLPINK			0xffa90e64
 # define WALLCRIMSONRED		0xffb00718
 
-/*
-** ********************************** typedefs *********************************
-*/
-
-typedef float2		t_vector;
-
-typedef struct			s_xy
-{
-	int					x;
-	int					y;
-}						t_xy;
 
 #endif
