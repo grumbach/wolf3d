@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/12 12:49:22 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/28 18:08:36 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/10/28 20:15:47 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,22 +33,23 @@ static void			turn_cam(t_cam *cam, const float speed)
 static int			sdl_keyboard(t_cam *cam)
 {
 	const Uint8		*state = SDL_GetKeyboardState(NULL);
-	t_vector		move;
 
 	if (state[SDL_SCANCODE_W])
-		move = (t_vector)
+		cam->origin = (t_vector)
 		{
-			cam->direction.y * MOVE_SPEED,
-			cam->direction.x * MOVE_SPEED
+			(int)(cam->origin.x + cam->direction.x * MOVE_SPEED) < MAP_SIZE ? \
+					cam->origin.x + cam->direction.x * MOVE_SPEED : 0,
+			(int)(cam->origin.y + cam->direction.y * MOVE_SPEED) < MAP_SIZE ? \
+					cam->origin.y + cam->direction.y * MOVE_SPEED : 0
 		};
 	if (state[SDL_SCANCODE_S])
-		move = (t_vector)
+		cam->origin = (t_vector)
 		{
-			cam->direction.y * -MOVE_SPEED,
-			cam->direction.x * -MOVE_SPEED
+			(int)(cam->origin.x + cam->direction.x * -MOVE_SPEED) < MAP_SIZE ? \
+					cam->origin.x + cam->direction.x * -MOVE_SPEED : 0,
+			(int)(cam->origin.y + cam->direction.y * -MOVE_SPEED) < MAP_SIZE ? \
+					cam->origin.y + cam->direction.y * -MOVE_SPEED : 0
 		};
-	cam->origin.x += move.x;
-	cam->origin.y += move.y;
 	if (state[SDL_SCANCODE_A])
 		turn_cam(cam, -TURN_SPEED);
 	if (state[SDL_SCANCODE_D])

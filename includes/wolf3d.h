@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:53:40 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/28 18:08:33 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/10/28 20:03:57 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,7 @@
 
 # define WIN_H				640
 # define WIN_W				1024
-# define MAP_H				24
-# define MAP_W				24
+# define MAP_SIZE			24
 
 # define SKYBOX				0xff333333
 # define GROUND				0xff666666
@@ -61,8 +60,8 @@
 # define EVENT_IDLE			1
 # define EVENT_UPDATE		2
 
-# define MOVE_SPEED			0.1
-# define TURN_SPEED			0.1
+# define MOVE_SPEED			0.0001
+# define TURN_SPEED			0.0001
 
 typedef struct			s_vector
 {

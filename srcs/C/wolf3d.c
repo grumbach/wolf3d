@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:52:41 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/28 18:09:44 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/10/28 20:14:00 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,9 +76,9 @@ static void	main_loop(t_cl *cl, t_sdl *sdl)
 	}
 }
 
-static void	map_init(char map[MAP_H][MAP_W])
+static void	map_init(char map[MAP_SIZE][MAP_SIZE])
 {
-	map = (char [MAP_H][MAP_W]){
+	map = (char [MAP_SIZE][MAP_SIZE]){
 	{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
@@ -107,7 +107,7 @@ static void	map_init(char map[MAP_H][MAP_W])
 
 int			main(void)
 {
-	char	map[MAP_H][MAP_W];
+	char	map[MAP_SIZE][MAP_SIZE];
 	t_cl	cl;
 	t_sdl	sdl;
 

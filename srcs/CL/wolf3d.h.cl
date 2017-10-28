@@ -14,12 +14,6 @@
 # define RT_H_CL
 
 /*
-** ********************************** rt ***************************************
-*/
-
-# include "vector.h.cl"
-
-/*
 ** ********************************** camera ***********************************
 */
 
@@ -32,7 +26,7 @@ typedef struct			s_cam
 }						t_cam;
 
 /*
-** ********************************** misc *************************************
+** ********************************** global ***********************************
 */
 
 # define GLOBAL_X			1
@@ -40,12 +34,16 @@ typedef struct			s_cam
 
 # define MAP_SIZE			24
 
-# define NOCOLOR			0xff000000
 # define WALLMIDNIGHTBLUE	0xff191970
 # define WALLSKYBLUE		0xff51bdff
 # define WALLPINK			0xffa90e64
 # define WALLCRIMSONRED		0xffb00718
-# define SCREEN_HEIGHT		640
+
+/*
+** ********************************** typedefs *********************************
+*/
+
+typedef float2		t_vector;
 
 typedef struct			s_xy
 {
