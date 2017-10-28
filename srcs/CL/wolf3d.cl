@@ -14,46 +14,41 @@
 
 static uint			get_color(const t_vector direction, const int side)
 {
-	const int bright = 1;
-
-	if (direction.y)
-		return ((direction.x > 0) ? WALLPINK: WALLCRIMSONRED);
-	return ((direction.x > 0) ? WALLSKYBLUE: WALLMIDNIGHTBLUE);
+	if (side)
+		return ((direction.x < 0) ? WALLPINK: WALLCRIMSONRED);
+	return ((direction.y < 0) ? WALLSKYBLUE: WALLMIDNIGHTBLUE);
 }
 
 static uint			get_height(__constant t_cam *cam, __constant char *map, \
 									const float cameraX, int *side)
 {
-	const char (*maps)[MAP_SIZE][MAP_SIZE] = (void*)map;
-	const t_vector		rayDir = (t_vector)
+	char 			(*maps)[MAP_SIZE][MAP_SIZE] = (void*)map;
+	const t_vector		rayDir =
 	{
 		cam->direction.x + cam->plane.x * cameraX,
 		cam->direction.y + cam->plane.y * cameraX
 	};
-	const t_vector		deltaDist = (t_vector)
+	const t_vector		deltaDist =
 	{
-		sqrt(1 + (rayDir.y * rayDir.y) / (rayDir.x * rayDir.x)),
-		sqrt(1 + 1 / (float)(rayDir.y * rayDir.y) / (rayDir.x * rayDir.x))
+		sqrt(1 + (rayDir.y * rayDir.y) / (float)(rayDir.x * rayDir.x)),
+		sqrt(1 + (rayDir.x * rayDir.x) / (float)(rayDir.y * rayDir.y))
 	};
-	t_xy				mapPos = (t_xy)
+	t_xy				mapPos =
 	{
 		(int)cam->origin.x,
 		(int)cam->origin.y
 	};
-	const t_vector		step = (t_vector)
+	const t_xy			step =
 	{
 		(rayDir.x < 0) ? -1 : 1,
 		(rayDir.y < 0) ? -1 : 1
 	};
-
-	const t_vector		sideDist = (t_vector)
+	t_vector			sideDist =
 	{
 		step.x * (mapPos.x - cam->origin.x + (1 + step.x) / 2) * deltaDist.x,
 		step.y * (mapPos.y - cam->origin.y + (1 + step.y) / 2) * deltaDist.y
 	};
-	int					hit = 0;
-
-	while (!hit)
+	while (42)
 	{
 		if (sideDist.x < sideDist.y)
 		{
@@ -68,19 +63,18 @@ static uint			get_height(__constant t_cam *cam, __constant char *map, \
 			*side = 1;
 		}
 		if ((*maps)[mapPos.x][mapPos.y] > 0)
-			hit = 1;
+			break;
 	}
-	if (!*side)
-		return (cam->screen_height / (mapPos.x - cam->origin.x + (1 - step.x) / 2) / rayDir.x);
-	return (cam->screen_height / (mapPos.y - cam->origin.y + (1 - step.y) / 2) / rayDir.y);
+	if (*side == 0)
+		return (cam->screen_height / (float)((mapPos.x - cam->origin.x + (1 - step.x) / (float)2) / (float)rayDir.x));
+	return (cam->screen_height / (float)((mapPos.y - cam->origin.y + (1 - step.y) / (float)2) / (float)rayDir.y));
 }
 
 __kernel void		core(__constant char *map, __constant t_cam *cam, \
 					__global uint *wall_height, __global uint *wall_color)
 {
-	const int 		x = get_global_id(0);
-	const int 		w = get_global_size(0);
-	const float		cameraX = 2 * x / float(w) - 1;
+	const int 		x = get_global_id(0) ;
+	const float		cameraX = 2 * x / (float)get_global_size(0) - 1;
 	int				side;
 
 	wall_height[x] = get_height(cam, map, cameraX, &side);
