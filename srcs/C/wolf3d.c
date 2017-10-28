@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:52:41 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/22 19:06:01 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/10/28 18:09:44 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,8 @@ static void	main_loop(t_cl *cl, t_sdl *sdl)
 	t_cam		cam;
 	int			loop;
 
-	cam = (t_cam){(t_vector){22, 12}, (t_vector){-1, 0}, 66, sdl->size.y};
+	cam = (t_cam){(t_vector){22, 12}, (t_vector){-1, 0}, \
+				(t_vector){0, 0.66}, sdl->size.y};
 	loop = EVENT_UPDATE;
 	while (loop)
 	{

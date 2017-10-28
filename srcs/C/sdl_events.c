@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/12 12:49:22 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/22 18:59:42 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/10/28 18:08:36 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,17 @@
 static void			turn_cam(t_cam *cam, const float speed)
 {
 	const float		oldy = cam->direction.y;
+	const float		oldplaney = cam->plane.y;
 
 	cam->direction = (t_vector)
 	{
 		cam->direction.x * sin(speed) + oldy * cos(speed),
 		cam->direction.x * cos(speed) - oldy * sin(speed)
+	};
+	cam->plane = (t_vector)
+	{
+		cam->plane.x * sin(speed) + oldplaney * cos(speed),
+		cam->plane.x * cos(speed) - oldplaney * sin(speed)
 	};
 }
 
