@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:53:40 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/29 17:13:21 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/11/01 15:07:39 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@
 # define EVENT_UPDATE		2
 
 # define MOVE_SPEED			0.5
-# define TURN_SPEED			(M_PI / 180.0 * 15.0)
+# define TURN_SPEED			0.1
 
 typedef struct			s_vector
 {

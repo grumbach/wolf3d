@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:52:41 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/28 20:14:00 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/11/01 17:54:28 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ static void	main_loop(t_cl *cl, t_sdl *sdl)
 	loop = EVENT_UPDATE;
 	while (loop)
 	{
-		if (loop == EVENT_UPDATE)
+		if (loop & EVENT_UPDATE)
 		{
 			cl_run(cl, (size_t[WORK_DIM]){sdl->size.x}, 3, \
 				(t_arg){&cam, sizeof(t_cam), CL_MEM_READ_ONLY}, \

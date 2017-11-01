@@ -6,13 +6,13 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/21 15:24:34 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/22 13:35:57 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/11/01 15:12:43 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "wolf3d.h"
 
-void				sdl_init_window(t_sdl *sdl)
+int					sdl_init_window(t_sdl *sdl)
 {
 	SDL_GetWindowSize(sdl->window, &sdl->size.x, &sdl->size.y);
 	SDL_FreeSurface(sdl->screen);
@@ -26,6 +26,7 @@ void				sdl_init_window(t_sdl *sdl)
 		sdl->size.x, sdl->size.y, BPP, 4 * sdl->size.x, \
 		0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000)))
 		errors(ERR_SDL, "SDL_CreateRGBSurface failed --");
+	return (EVENT_UPDATE);
 }
 
 void				sdl_init(t_sdl *sdl, const char *window_name)

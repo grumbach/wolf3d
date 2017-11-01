@@ -45,8 +45,8 @@ static uint			get_height(__constant t_cam *cam, __constant char *map, \
 	};
 	t_vector			sideDist =
 	{
-		step.x * (mapPos.x - cam->origin.x + (1 + step.x) / 2) * deltaDist.x,
-		step.y * (mapPos.y - cam->origin.y + (1 + step.y) / 2) * deltaDist.y
+		step.x * (mapPos.x - cam->origin.x + (1 + step.x) / (float)2) * deltaDist.x,
+		step.y * (mapPos.y - cam->origin.y + (1 + step.y) / (float)2) * deltaDist.y
 	};
 	while (42)
 	{
@@ -66,8 +66,8 @@ static uint			get_height(__constant t_cam *cam, __constant char *map, \
 			break;
 	}
 	if (*side == 0)
-		return (cam->screen_height / (float)((mapPos.x - cam->origin.x + (1 - step.x) / (float)2) / (float)rayDir.x));
-	return (cam->screen_height / (float)((mapPos.y - cam->origin.y + (1 - step.y) / (float)2) / (float)rayDir.y));
+		return (cam->screen_height / ((float)((mapPos.x - cam->origin.x + (1 - step.x) / (float)2) / (float)rayDir.x)));
+	return (cam->screen_height / ((float)((mapPos.y - cam->origin.y + (1 - step.y) / (float)2) / (float)rayDir.y)));
 }
 
 __kernel void		core(__constant char *map, __constant t_cam *cam, \
@@ -77,6 +77,8 @@ __kernel void		core(__constant char *map, __constant t_cam *cam, \
 	const float		cameraX = 2 * x / (float)get_global_size(0) - 1;
 	int				side;
 
+	if (!x)
+		printf("[%f][%f]:->[%f][%f]\n", cam->origin.x, cam->origin.y, cam->direction.x, cam->direction.y);
 	wall_height[x] = get_height(cam, map, cameraX, &side);
 	wall_color[x] = get_color(cam->direction, side);
 }
