@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/12 12:49:22 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/11/01 18:18:05 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/11/04 16:33:46 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,25 +66,27 @@ static int			sdl_mouse(t_sdl *sdl, t_cam *cam)
 
 	SDL_GetMouseState(&x, NULL);
 	x -= sdl->size.x / 2;
-	if (x > 0)
-		turn_cam(cam, x * TURN_SPEED / (float)42);
-	else
-		turn_cam(cam, x * TURN_SPEED / (float)42);
+	turn_cam(cam, x * -TURN_SPEED / (float)42);
 	SDL_WarpMouseInWindow(sdl->window, sdl->size.x / 2, sdl->size.y / 2);
 	return (EVENT_UPDATE);
 }
 
 int					sdl_events(t_sdl *sdl, t_cam *cam)
 {
+	t_xy			windowSize;
+
 	if (SDL_PollEvent(&sdl->event))
 	{
 		if (sdl->event.window.type == SDL_WINDOWEVENT_CLOSE || \
 			sdl->event.key.keysym.sym == SDLK_ESCAPE || \
 			sdl->event.type == SDL_QUIT)
 			return (EVENT_STOP);
-		if (sdl->event.type == SDL_WINDOWEVENT &&
-			sdl->event.window.event == SDL_WINDOWEVENT_RESIZED)
+		SDL_GetWindowSize(sdl->window, &windowSize.x, &windowSize.y);
+		if (windowSize.x != sdl->size.x || windowSize.y != sdl->size.y)
+		{
+			windowSize = sdl->size;
 			return (sdl_init_window(sdl));
+		}
 		return (sdl_keyboard(cam) | sdl_mouse(sdl, cam));
 	}
 	return (EVENT_IDLE);

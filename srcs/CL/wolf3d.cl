@@ -22,7 +22,7 @@ static uint			get_color(const t_vector direction, const int side)
 static uint			get_height(__constant t_cam *cam, __constant char *map, \
 									const float cameraX, int *side)
 {
-	char 			(*maps)[MAP_SIZE][MAP_SIZE] = (void*)map;
+	__constant char 	(*maps)[MAP_SIZE][MAP_SIZE] = map;
 	const t_vector		rayDir =
 	{
 		cam->direction.x + cam->plane.x * cameraX,
@@ -77,8 +77,8 @@ __kernel void		core(__constant char *map, __constant t_cam *cam, \
 	const float		cameraX = 2 * x / (float)get_global_size(0) - 1;
 	int				side;
 
-	if (!x)
-		printf("[%f][%f]:->[%f][%f]\n", cam->origin.x, cam->origin.y, cam->direction.x, cam->direction.y);
+	// if (!x)
+	// 	printf("[%f][%f]:->[%f][%f]\n", cam->origin.x, cam->origin.y, cam->direction.x, cam->direction.y);
 	wall_height[x] = get_height(cam, map, cameraX, &side);
 	wall_color[x] = get_color(cam->direction, side);
 }

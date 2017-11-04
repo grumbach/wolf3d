@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/28 11:54:05 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/21 17:27:24 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/11/04 16:27:07 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@
 # define CL_FILENAME		"srcs/CL/wolf3d.cl"
 # define CL_KERNEL_NAME		"core"
 # define CL_CC_FLAGS		"-I. -Isrcs/CL -cl-mad-enable -cl-fast-relaxed-math"
-# define CL_DEVICE			CL_DEVICE_TYPE_ALL
+# define CL_DEVICE			CL_DEVICE_TYPE_CPU
 # define MAX_KERNEL_ARGS	5
 # define WORK_DIM			1
 

@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:52:41 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/11/01 17:54:28 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/11/04 16:11:34 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,13 @@
 static void	map_redraw(t_sdl *sdl)
 {
 	uint32_t	(*pixels)[sdl->size.y][sdl->size.x];
-	t_yx		i;
+	t_xy		i;
 	uint		wall_color;
 	int			height;
 	int			step;
 
 	pixels = (void*)sdl->pixels;
-	i = (t_yx){sdl->size.y, sdl->size.x};
+	i = (t_xy){sdl->size.x, sdl->size.y};
 	while (i.x--)
 	{
 		i.y = sdl->size.y;
