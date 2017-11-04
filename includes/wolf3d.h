@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:53:40 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/11/04 16:02:18 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/11/04 20:25:35 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@
 /*
 ** ********************************** Local ************************************
 */
-
 
 # include "libft.h"
 # include "easy_cl.h"
@@ -75,7 +74,7 @@ typedef struct			s_cam
 	t_vector			direction;
 	t_vector			plane;
 	uint				screen_height;
-	uint32_t : 32;
+	uint32_t			padding_opencl;
 }						t_cam;
 
 int						sdl_events(t_sdl *sdl, t_cam *cam);

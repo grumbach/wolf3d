@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/27 00:20:21 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/21 17:25:20 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/11/05 15:19:27 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 long			errors(const int err, const char *comment)
 {
-	ft_putstr_fd("RT: ", 2);
+	ft_putstr_fd(PROGRAM_NAME": ", 2);
 	if (comment)
 	{
 		ft_putstr_fd(comment, 2);
@@ -27,7 +27,7 @@ long			errors(const int err, const char *comment)
 	else if (err == ERR_SDL)
 		ft_putendl_fd(SDL_GetError(), 2);
 	else if (err == ERR_USAGE)
-		ft_putendl_fd("\nUsage : ./"PROGRAM_NAME" scene.xml\n", 2);
+		ft_putendl_fd("\nUsage : ./"PROGRAM_NAME" [filename]\n", 2);
 	exit(EXIT_FAILURE);
 	return (0);
 }

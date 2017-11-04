@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/12 12:49:22 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/11/04 16:33:46 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/11/05 16:21:58 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,12 +29,13 @@ static void			turn_cam(t_cam *cam, const float speed)
 
 static void			move_cam(t_cam *cam, const float speed)
 {
-	t_vector		new = (t_vector)
+	t_vector		new;
+
+	new = (t_vector)
 	{
 		cam->origin.x + cam->direction.x * speed,
 		cam->origin.y + cam->direction.y * speed
 	};
-
 	if (new.x > MAP_SIZE || new.x < 0)
 		new.x = cam->origin.x;
 	if (new.y > MAP_SIZE || new.y < 0)
@@ -73,18 +74,19 @@ static int			sdl_mouse(t_sdl *sdl, t_cam *cam)
 
 int					sdl_events(t_sdl *sdl, t_cam *cam)
 {
-	t_xy			windowSize;
+	t_xy			window_size;
 
 	if (SDL_PollEvent(&sdl->event))
 	{
-		if (sdl->event.window.type == SDL_WINDOWEVENT_CLOSE || \
+		if ((sdl->event.type == SDL_WINDOWEVENT && \
+			sdl->event.window.type == SDL_WINDOWEVENT_CLOSE) || \
 			sdl->event.key.keysym.sym == SDLK_ESCAPE || \
 			sdl->event.type == SDL_QUIT)
 			return (EVENT_STOP);
-		SDL_GetWindowSize(sdl->window, &windowSize.x, &windowSize.y);
-		if (windowSize.x != sdl->size.x || windowSize.y != sdl->size.y)
+		SDL_GetWindowSize(sdl->window, &window_size.x, &window_size.y);
+		if (window_size.x != sdl->size.x || window_size.y != sdl->size.y)
 		{
-			windowSize = sdl->size;
+			window_size = sdl->size;
 			return (sdl_init_window(sdl));
 		}
 		return (sdl_keyboard(cam) | sdl_mouse(sdl, cam));

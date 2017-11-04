@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/21 02:25:45 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/10/21 17:27:31 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/11/05 14:22:33 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,15 +83,12 @@ static inline void	cl_run_args(t_cl *cl, const t_arg *arg, const int nb_arg)
 	}
 	i = cl->nb_const - 1;
 	while (++i < nb_arg + cl->nb_const)
-	{
-		cl->variables[i] = clCreateBuffer(cl->context, arg[i].flag, \
-			arg[i].size, NULL, &ret);
-		ret ? errors(ERR_CL, "clCreateBuffer failure --") : 0;
-	}
+		if (!(cl->variables[i] = clCreateBuffer(cl->context, arg[i].flag, \
+			arg[i].size, NULL, &ret)))
+			errors(ERR_CL, "clCreateBuffer failure --");
 	i = cl->nb_const - 1;
 	while (++i < nb_arg + cl->nb_const)
-		if ((arg[i].flag == CL_MEM_READ_WRITE || \
-			arg[i].flag == CL_MEM_READ_ONLY) && \
+		if (arg[i].flag & (CL_MEM_READ_WRITE | CL_MEM_READ_ONLY) && \
 			clEnqueueWriteBuffer(cl->command_queue, cl->variables[i], CL_TRUE, \
 			0, arg[i].size, arg[i].ptr, 0, NULL, NULL))
 			errors(ERR_CL, "clEnqueueWriteBuffer failure --");
@@ -116,8 +113,8 @@ void				cl_run(t_cl *cl, size_t work_size[WORK_DIM], \
 		arg[i] = va_arg(ap, t_arg);
 	va_end(ap);
 	cl_run_args(cl, arg, nb_arg);
-	if ((i = clEnqueueNDRangeKernel(cl->command_queue, cl->kernel, WORK_DIM, NULL, \
-		work_size, NULL, 0, NULL, NULL)))
+	if ((i = clEnqueueNDRangeKernel(cl->command_queue, cl->kernel, WORK_DIM, \
+		NULL, work_size, NULL, 0, NULL, NULL)))
 		errors(cl_error_log(cl, i), "clEnqueueNDRangeKernel failure --");
 	if (clFinish(cl->command_queue))
 		errors(ERR_CL, "clFinish failure --");

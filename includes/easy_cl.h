@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/28 11:54:05 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/11/04 16:27:07 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/11/04 20:13:07 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,8 @@ typedef struct			s_cl
 */
 
 void					cl_init(t_cl *cl, const int nb_const, ...);
-void					cl_run(t_cl *cl, size_t work_size[WORK_DIM], const int nb_arg, ...);
+void					cl_run(t_cl *cl, size_t work_size[WORK_DIM], \
+												const int nb_arg, ...);
 void					cl_end(t_cl *cl);
 
 /*

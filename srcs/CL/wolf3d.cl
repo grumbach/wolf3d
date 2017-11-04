@@ -15,14 +15,14 @@
 static uint			get_color(const t_vector direction, const int side)
 {
 	if (side)
-		return ((direction.x < 0) ? WALLPINK: WALLCRIMSONRED);
-	return ((direction.y < 0) ? WALLSKYBLUE: WALLMIDNIGHTBLUE);
+		return ((direction.y < 0) ? WALLPINK: WALLCRIMSONRED);
+	return ((direction.x < 0) ? WALLSKYBLUE: WALLMIDNIGHTBLUE);
 }
 
 static uint			get_height(__constant t_cam *cam, __constant char *map, \
 									const float cameraX, int *side)
 {
-	__constant char 	(*maps)[MAP_SIZE][MAP_SIZE] = map;
+	char			(*maps)[MAP_SIZE][MAP_SIZE] = (void*)map;
 	const t_vector		rayDir =
 	{
 		cam->direction.x + cam->plane.x * cameraX,
@@ -48,6 +48,7 @@ static uint			get_height(__constant t_cam *cam, __constant char *map, \
 		step.x * (mapPos.x - cam->origin.x + (1 + step.x) / (float)2) * deltaDist.x,
 		step.y * (mapPos.y - cam->origin.y + (1 + step.y) / (float)2) * deltaDist.y
 	};
+
 	while (42)
 	{
 		if (sideDist.x < sideDist.y)
@@ -62,7 +63,7 @@ static uint			get_height(__constant t_cam *cam, __constant char *map, \
 			mapPos.y += step.y;
 			*side = 1;
 		}
-		if ((*maps)[mapPos.x][mapPos.y] > 0)
+		if ((*maps)[mapPos.x][mapPos.y] != '0')
 			break;
 	}
 	if (*side == 0)
@@ -78,7 +79,9 @@ __kernel void		core(__constant char *map, __constant t_cam *cam, \
 	int				side;
 
 	// if (!x)
+	// 	printf("[%s]\n", (void*)map);
 	// 	printf("[%f][%f]:->[%f][%f]\n", cam->origin.x, cam->origin.y, cam->direction.x, cam->direction.y);
+
 	wall_height[x] = get_height(cam, map, cameraX, &side);
 	wall_color[x] = get_color(cam->direction, side);
 }
