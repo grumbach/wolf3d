@@ -51,14 +51,15 @@ static uint			get_height(__constant t_cam *cam, __constant char *map, \
 
 	while (42)
 	{
-		*side = (int)(!(sideDist.y / sideDist.x));
-		sideDist[*side] += deltaDist[*side];
-		mapPos[*side] += step[*side];
+		*side = !((int)(sideDist.y / sideDist.x));
+		((float *)&sideDist)[*side] += ((float *)&deltaDist)[*side];
+		((int *)&mapPos)[*side] += ((int *)&step)[*side];
 		if ((*maps)[mapPos.x][mapPos.y] != '0')
-			break;
+  			break;
 	}
-	return (cam->screen_height / ((float)((mapPos[*side] - cam->origin[*side] \
-		+ (1 - step[*side]) / (float)2) / (float)rayDir[*side])));
+	return (cam->screen_height / ((float)((((int *)&mapPos)[*side] - \
+		((float *)&cam->origin)[*side] + (1 - ((int *)&step)[*side]) \
+	 	/ (float)2) / (float)((float *)&rayDir)[*side])));
 }
 
 __kernel void		core(__constant char *map, __constant t_cam *cam, \
