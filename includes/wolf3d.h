@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:53:40 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/11/04 20:25:35 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/11/19 20:22:02 by angavrel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,8 @@ typedef struct			s_cam
 	uint32_t			padding_opencl;
 }						t_cam;
 
-int						sdl_events(t_sdl *sdl, t_cam *cam);
+int						sdl_events(const char map[MAP_SIZE][MAP_SIZE], \
+										t_sdl *sdl, t_cam *cam);
 
 /*
 ** *****************************************************************************
