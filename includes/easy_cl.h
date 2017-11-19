@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/28 11:54:05 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/11/04 20:13:07 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/11/19 17:17:07 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ typedef struct			s_cl
 	cl_program			program;
 	cl_kernel			kernel;
 	cl_device_id		device_id;
-	cl_mem				variables[MAX_KERNEL_ARGS + 1];
+	cl_mem				var[MAX_KERNEL_ARGS + 1];
 	int					nb_const;
 }						t_cl;
 
@@ -84,9 +84,10 @@ typedef struct			s_cl
 ** *****************************************************************************
 */
 
-void					cl_init(t_cl *cl, const int nb_const, ...);
+void					cl_init(t_cl *cl, const int nb_const, \
+							const t_arg constant[nb_const]);
 void					cl_run(t_cl *cl, size_t work_size[WORK_DIM], \
-												const int nb_arg, ...);
+							const int nb_arg, const t_arg arg[nb_arg]);
 void					cl_end(t_cl *cl);
 
 /*
