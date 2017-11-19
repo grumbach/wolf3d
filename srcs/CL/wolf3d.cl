@@ -12,22 +12,10 @@
 
 # include "wolf3d.h.cl"
 
-static uint			get_color(const t_vector direction, const int side)
-{
-	if (side)
-		return ((direction.y < 0) ? WALLPINK: WALLCRIMSONRED);
-	return ((direction.x < 0) ? WALLSKYBLUE: WALLMIDNIGHTBLUE);
-}
-
-static uint			get_height(__constant t_cam *cam, __constant char *map, \
-									const float cameraX, int *side)
+static float			get_height(const t_vector origin, __constant char *map, \
+									const t_vector rayDir, int *side)
 {
 	char			(*maps)[MAP_SIZE][MAP_SIZE] = (void*)map;
-	const t_vector		rayDir =
-	{
-		cam->direction.x + cam->plane.x * cameraX,
-		cam->direction.y + cam->plane.y * cameraX
-	};
 	const t_vector		deltaDist =
 	{
 		sqrt(1 + (rayDir.y * rayDir.y) / (float)(rayDir.x * rayDir.x)),
@@ -35,8 +23,8 @@ static uint			get_height(__constant t_cam *cam, __constant char *map, \
 	};
 	t_xy				mapPos =
 	{
-		(int)cam->origin.x,
-		(int)cam->origin.y
+		(int)origin.x,
+		(int)origin.y
 	};
 	const t_xy			step =
 	{
@@ -45,8 +33,8 @@ static uint			get_height(__constant t_cam *cam, __constant char *map, \
 	};
 	t_vector			sideDist =
 	{
-		step.x * (mapPos.x - cam->origin.x + (1 + step.x) / (float)2) * deltaDist.x,
-		step.y * (mapPos.y - cam->origin.y + (1 + step.y) / (float)2) * deltaDist.y
+		step.x * (mapPos.x - origin.x + (1 + step.x) / (float)2) * deltaDist.x,
+		step.y * (mapPos.y - origin.y + (1 + step.y) / (float)2) * deltaDist.y
 	};
 
 	while (42)
@@ -57,9 +45,9 @@ static uint			get_height(__constant t_cam *cam, __constant char *map, \
 		if ((*maps)[mapPos.x][mapPos.y] != '0')
   			break;
 	}
-	return (cam->screen_height / ((float)((((int *)&mapPos)[*side] - \
-		((float *)&cam->origin)[*side] + (1 - ((int *)&step)[*side]) \
-	 	/ (float)2) / (float)((float *)&rayDir)[*side])));
+	return ((float)((((int *)&mapPos)[*side] - \
+		((float *)&origin)[*side] + (1 - ((int *)&step)[*side]) \
+	 	/ (float)2) / (float)((float *)&rayDir)[*side]));
 }
 
 __kernel void		core(__constant char *map, __constant t_cam *cam, \
@@ -67,12 +55,16 @@ __kernel void		core(__constant char *map, __constant t_cam *cam, \
 {
 	const int 		x = get_global_id(0) ;
 	const float		cameraX = 2 * x / (float)get_global_size(0) - 1;
+	const t_vector	rayDir =
+	{
+		cam->direction.x + cam->plane.x * cameraX,
+		cam->direction.y + cam->plane.y * cameraX
+	};
 	int				side;
+	const float 	wallDist = get_height(cam->origin, map, rayDir, &side);
+	const float 	wallX = ((float *)&cam->origin)[1 - side] \
+						+ wallDist * ((float *)&rayDir)[1 - side];
 
-	// if (!x)
-	// 	printf("[%s]\n", (void*)map);
-	// 	printf("[%f][%f]:->[%f][%f]\n", cam->origin.x, cam->origin.y, cam->direction.x, cam->direction.y);
-
-	wall_height[x] = get_height(cam, map, cameraX, &side);
-	wall_color[x] = get_color(cam->direction, side);
+	wall_height[x] = cam->screen_height / wallDist;
+	wall_color[x] = 0xff000000 | (int)(((wallX - (int)wallX) * 0xff)) << 16;
 }
