@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:52:41 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/11/19 17:08:59 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/11/19 20:20:45 by angavrel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ static void	map_redraw(t_sdl *sdl)
 	}
 }
 
-static void	main_loop(t_cl *cl, t_sdl *sdl)
+static void	main_loop(const char map[MAP_SIZE][MAP_SIZE], t_cl *cl, t_sdl *sdl)
 {
 	t_cam		cam;
 	int			loop;
@@ -73,7 +73,7 @@ static void	main_loop(t_cl *cl, t_sdl *sdl)
 			map_redraw(sdl);
 			sdl_run(sdl);
 		}
-		loop = sdl_events(sdl, &cam);
+		loop = sdl_events(map, sdl, &cam);
 	}
 }
 
@@ -106,7 +106,7 @@ int			main(int ac, char **av)
 	cl_init(&cl, 1, (t_arg[1]) {(t_arg) {map, sizeof(map), CL_MEM_READ_ONLY}});
 	sdl_init(&sdl, PROGRAM_NAME);
 
-	main_loop(&cl, &sdl);
+	main_loop(map, &cl, &sdl);
 
 	cl_end(&cl);
 	sdl_end(&sdl);
