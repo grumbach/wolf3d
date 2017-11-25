@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/12 12:49:22 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/11/25 17:22:25 by angavrel         ###   ########.fr       */
+/*   Updated: 2017/11/25 20:43:57 by angavrel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,7 @@ static int			move_cam(const char map[MAP_SIZE][MAP_SIZE], t_cam *cam, \
 	return (EVENT_UPDATE);
 }
 
-static int			sdl_keyboard(SDL_Window* window, \
-							const char map[MAP_SIZE][MAP_SIZE], t_cam *cam)
+static int			sdl_keyboard(const char map[MAP_SIZE][MAP_SIZE], t_cam *cam)
 {
 	const Uint8		*state = SDL_GetKeyboardState(NULL);
 	int				event;
@@ -73,12 +72,6 @@ static int			sdl_keyboard(SDL_Window* window, \
 		event = move_cam(map, cam, MOVE_SPEED / 2, 0);
 	if (state[SDL_SCANCODE_ESCAPE])
 		event = EVENT_STOP;
-	if (state[SDL_SCANCODE_M])
-	{
-		event = display_minimap(window, map, cam->direction, cam->origin);
-		printf("\n\nhey\n\n");
-	}
-
 	return (event);
 }
 
@@ -93,12 +86,13 @@ static int			sdl_mouse(t_sdl *sdl, t_cam *cam)
 	return (EVENT_UPDATE);
 }
 
-int					sdl_events(const char	map[MAP_SIZE][MAP_SIZE], t_sdl *sdl,
+int					sdl_events(const char map[MAP_SIZE][MAP_SIZE], t_sdl *sdl,
 						t_cam *cam)
 {
 	t_xy			window_size;
 	SDL_Event		event;
 
+	sdl->display_mm = 1;
 	while (SDL_PollEvent(&event))
 	{
 		if (event.type == SDL_QUIT || (event.type == SDL_WINDOWEVENT && \
@@ -110,7 +104,10 @@ int					sdl_events(const char	map[MAP_SIZE][MAP_SIZE], t_sdl *sdl,
 			window_size = sdl->size;
 			return (sdl_init_window(sdl));
 		}
-		event.type = sdl_keyboard(sdl->window, map, cam);
+		if (event.type == SDL_KEYDOWN)
+			event.type = toggle_minimap(&sdl->display_mm, &sdl->radius, event.key.keysym.sym);
+		else
+			event.type = sdl_keyboard(map, cam);
 		return (event.type |= (event.type == EVENT_STOP) ?
 						0 : sdl_mouse(sdl, cam));
 	}

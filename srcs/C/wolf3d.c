@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:52:41 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/11/19 20:20:45 by angavrel         ###   ########.fr       */
+/*   Updated: 2017/11/25 19:34:13 by angavrel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,8 @@ static void	main_loop(const char map[MAP_SIZE][MAP_SIZE], t_cl *cl, t_sdl *sdl)
 			});
 			map_redraw(sdl);
 			sdl_run(sdl);
+			if (sdl->display_mm)
+				display_minimap(sdl, map, cam.direction, cam.origin);
 		}
 		loop = sdl_events(map, sdl, &cam);
 	}

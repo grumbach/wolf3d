@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/21 15:24:34 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/11/01 15:12:43 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/11/25 20:42:10 by angavrel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ void				sdl_init(t_sdl *sdl, const char *window_name)
 	sdl_init_window(sdl);
 	SDL_WarpMouseInWindow(sdl->window, sdl->size.x / 2, sdl->size.y / 2);
 	SDL_ShowCursor(SDL_DISABLE);
+	sdl->radius = 18;
 }
 
 void				sdl_run(t_sdl *sdl)

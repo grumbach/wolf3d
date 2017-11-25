@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/28 11:55:45 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/11/25 17:17:11 by angavrel         ###   ########.fr       */
+/*   Updated: 2017/11/25 20:44:13 by angavrel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,8 @@ typedef struct			s_sdl
 	SDL_Surface			*draw_surface;
 	t_xy				size;
 	uint32_t			*pixels;
+	int					display_mm;
+	int					radius;
 }						t_sdl;
 
 void					sdl_init(t_sdl *sdl, const char *window_name);
