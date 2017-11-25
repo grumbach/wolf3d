@@ -6,7 +6,7 @@
 #    By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/05/25 11:36:26 by agrumbac          #+#    #+#              #
-#    Updated: 2017/10/21 18:45:00 by agrumbac         ###   ########.fr        #
+#    Updated: 2017/11/25 15:30:35 by angavrel         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@
 
 NAME = wolf3d
 
-SRC = wolf3d.c cl.c sdl.c sdl_events.c errors.c
+SRC = wolf3d.c cl.c sdl.c sdl_events.c errors.c minimap.c
 
 SRCDIR = srcs/C/
 

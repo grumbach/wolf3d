@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/12 12:49:22 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/11/19 20:48:58 by angavrel         ###   ########.fr       */
+/*   Updated: 2017/11/25 17:22:25 by angavrel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,8 @@ static int			move_cam(const char map[MAP_SIZE][MAP_SIZE], t_cam *cam, \
 	return (EVENT_UPDATE);
 }
 
-static int			sdl_keyboard(const char map[MAP_SIZE][MAP_SIZE], t_cam *cam)
+static int			sdl_keyboard(SDL_Window* window, \
+							const char map[MAP_SIZE][MAP_SIZE], t_cam *cam)
 {
 	const Uint8		*state = SDL_GetKeyboardState(NULL);
 	int				event;
@@ -72,8 +73,12 @@ static int			sdl_keyboard(const char map[MAP_SIZE][MAP_SIZE], t_cam *cam)
 		event = move_cam(map, cam, MOVE_SPEED / 2, 0);
 	if (state[SDL_SCANCODE_ESCAPE])
 		event = EVENT_STOP;
-//	if (state[SDL_SCANCODE_M])
-	//	event = display_minimap(cam, MOVE_SPEED);// TODO
+	if (state[SDL_SCANCODE_M])
+	{
+		event = display_minimap(window, map, cam->direction, cam->origin);
+		printf("\n\nhey\n\n");
+	}
+
 	return (event);
 }
 
@@ -92,13 +97,12 @@ int					sdl_events(const char	map[MAP_SIZE][MAP_SIZE], t_sdl *sdl,
 						t_cam *cam)
 {
 	t_xy			window_size;
-	int				event;
+	SDL_Event		event;
 
-	while (SDL_PollEvent(&sdl->event))
+	while (SDL_PollEvent(&event))
 	{
-		if ((sdl->event.type == SDL_WINDOWEVENT && \
-			sdl->event.window.type == SDL_WINDOWEVENT_CLOSE) || \
-			sdl->event.type == SDL_QUIT)
+		if (event.type == SDL_QUIT || (event.type == SDL_WINDOWEVENT && \
+			event.window.type == SDL_WINDOWEVENT_CLOSE))
 			return (EVENT_STOP);
 		SDL_GetWindowSize(sdl->window, &window_size.x, &window_size.y);
 		if (window_size.x != sdl->size.x || window_size.y != sdl->size.y)
@@ -106,9 +110,9 @@ int					sdl_events(const char	map[MAP_SIZE][MAP_SIZE], t_sdl *sdl,
 			window_size = sdl->size;
 			return (sdl_init_window(sdl));
 		}
-		if ((event = sdl_keyboard(map, cam)) == EVENT_STOP)
-			return (EVENT_STOP);
-		return (sdl_mouse(sdl, cam) | event);
+		event.type = sdl_keyboard(sdl->window, map, cam);
+		return (event.type |= (event.type == EVENT_STOP) ?
+						0 : sdl_mouse(sdl, cam));
 	}
 	return (EVENT_IDLE);
 }

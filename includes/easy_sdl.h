@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/28 11:55:45 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/11/04 16:10:32 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/11/25 17:17:11 by angavrel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,6 @@ typedef struct			s_sdl
 	SDL_Window			*window;
 	SDL_Surface			*screen;
 	SDL_Surface			*draw_surface;
-	SDL_Event			event;
 	t_xy				size;
 	uint32_t			*pixels;
 }						t_sdl;
