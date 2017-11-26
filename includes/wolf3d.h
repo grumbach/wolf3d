@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:53:40 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/11/25 20:44:44 by angavrel         ###   ########.fr       */
+/*   Updated: 2017/11/26 17:36:18 by angavrel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,6 @@ int						sdl_events(const char map[MAP_SIZE][MAP_SIZE], \
 
 long					errors(const int err, const char *comment);
 void					display_minimap(t_sdl *sdl, \
-		const char map[MAP_SIZE][MAP_SIZE], t_vector dir, t_vector pos);
-int						toggle_minimap(int *display_mm, int *radius, int key);
+		const char map[MAP_SIZE][MAP_SIZE], t_vector pos);
 
 #endif

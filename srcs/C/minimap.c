@@ -6,75 +6,57 @@
 /*   By: angavrel <angavrel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/11/25 15:21:14 by angavrel          #+#    #+#             */
-/*   Updated: 2017/11/25 20:54:07 by angavrel         ###   ########.fr       */
+/*   Updated: 2017/11/26 17:35:56 by angavrel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "wolf3d.h"
 
-
-int			toggle_minimap(int *display_mm, int *radius, int key)
+static void	draw_walls(const char map[MAP_SIZE][MAP_SIZE], SDL_Surface *minimap,
+	t_vector pos, const int block)
 {
-	if (key == SDLK_m)
-		*display_mm = !*display_mm;
-	else if (key == SDLK_KP_PLUS && *radius > 3)
-	{
-		printf("heeherh\n");
-			--*radius;
-	}
+	const int		mm_size = 180;
+	const int		a = mm_size / 2 / block;
+	SDL_Surface		*wall;
+	SDL_Rect		i;
+	SDL_Rect		j;
 
-	else if (key == SDLK_KP_MINUS && *radius < 30)
-		++*radius;
-	return (EVENT_UPDATE);
+	wall = SDL_CreateRGBSurface(0, block, block, 32, 0, 0, 0, 0);
+	SDL_FillRect(wall, NULL, SDL_MapRGB(wall->format, 15, 15, 15));
+	i.y = mm_size / block;
+	while (i.y--)
+	{
+		i.x = mm_size / block;
+		while (i.x--)
+		{
+			if ((int)pos.x + i.x - a > -1 && (int)pos.x + i.x - a < MAP_SIZE \
+			&& (int)pos.y + i.y - a > -1 && (int)pos.y + i.y - a < MAP_SIZE \
+			&& map[(int)pos.x + i.x - a][(int)pos.y + i.y - a] != '0')
+			{
+				j.x = i.x * block;
+				j.y = i.y * block;
+				SDL_BlitSurface(wall, 0, minimap, &j);
+			}
+		}
+	}
 }
 
-void		display_minimap(t_sdl *sdl, const char map[MAP_SIZE][MAP_SIZE],\
-								t_vector dir, t_vector pos)
+void		display_minimap(t_sdl *sdl, const char map[MAP_SIZE][MAP_SIZE], \
+								t_vector pos)
 {
-	const int mm_size = 180;
-	const int wall_block = mm_size / sdl->radius;
+	const int		mm_size = 180;
+	const int		block = mm_size / sdl->radius;
+	SDL_Surface		*minimap;
+	SDL_Surface		*me;
+	SDL_Rect		offset;
 
-	SDL_Surface*    minimap;
-	SDL_Surface*    wall;
-	SDL_Surface*    player;
-
-	t_vector osef = pos;//to be removed
-	osef = dir;//to be removed
-
-	minimap = SDL_CreateRGBSurface(0, mm_size, mm_size, 32, 0, 0xff, 0x50, 0);
-	SDL_FillRect(minimap, NULL, SDL_MapRGB(minimap->format, 0, 0xff, 0x50));
-
-	wall = SDL_CreateRGBSurface(0, wall_block, wall_block, 32, 0, 0, 0, 0);
-	SDL_FillRect(wall, NULL, SDL_MapRGB(wall->format, 15, 15, 15));
-
-	SDL_Rect offset;
-	offset.x = mm_size / 2 - wall_block / 2;
-	offset.y = mm_size / 2 - wall_block / 2;
-	player = SDL_CreateRGBSurface(0, wall_block / 2, wall_block / 2, 32, 0, 0, 0, 0);
-	SDL_BlitSurface(player, 0, minimap, &offset);
-
-	SDL_Rect i;
-	const int a = mm_size / 2 / wall_block;
-	i.y = 0;
-	while (i.y < mm_size / wall_block)
-	{
-		i.x = 0;
-		while (i.x < mm_size / wall_block)
-		{
-			if (pos.x + i.x - a > -1 && pos.y + i.y - a > -1 \
-				&& pos.x + i.x - a < MAP_SIZE && pos.y + i.y - a < MAP_SIZE \
-				&& map[(int)pos.x + i.x - a][(int)pos.y + i.y - a] != '0')
-				{
-					SDL_Rect j;
-					j.x = i.x * wall_block;
-					j.y = i.y * wall_block;
-					SDL_BlitSurface(wall, 0, minimap, &j);
-				}
-			++i.x;
-		}
-		++i.y;
-	}
-	SDL_BlitSurface(player, 0, minimap, &offset);
+	minimap = SDL_CreateRGBSurface(0, mm_size, mm_size, 32, \
+		0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+	draw_walls(map, minimap, pos, block);
+	offset.x = (mm_size - block) / 2;
+	offset.y = (mm_size - block) / 2;
+	me = SDL_CreateRGBSurface(0, block / 2, block / 2, 32, 0, 0, 0, 0);
+	SDL_BlitSurface(me, 0, minimap, &offset);
 	SDL_BlitSurface(minimap, 0, sdl->screen, 0);
 	SDL_UpdateWindowSurface(sdl->window);
 }
