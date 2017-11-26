@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:52:41 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/11/26 17:36:29 by angavrel         ###   ########.fr       */
+/*   Updated: 2017/11/26 17:58:44 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,14 +51,14 @@ static void	map_redraw(t_sdl *sdl)
 	}
 }
 
-static void	main_loop(const char map[MAP_SIZE][MAP_SIZE], t_cl *cl, t_sdl *sdl)
+static void	main_loop(const char map[MAP_SIZE][MAP_SIZE], t_cl *cl, /*t_cl *cl_draw,*/ t_sdl *sdl)
 {
 	t_cam		cam;
 	int			loop;
 
 	cam = (t_cam){(t_vector){22, 12}, (t_vector){-1, 0}, \
 				(t_vector){0, 0.66}, sdl->size.y, 0};
-	loop = EVENT_IDLE;
+	loop = EVENT_UPDATE;
 	while (loop)
 	{
 		if (loop & EVENT_UPDATE)
@@ -70,9 +70,10 @@ static void	main_loop(const char map[MAP_SIZE][MAP_SIZE], t_cl *cl, t_sdl *sdl)
 				(t_arg) {(sdl->pixels + ((sdl->size.y / 2) * sdl->size.x)), \
 					sizeof(uint) * sdl->size.x, CL_MEM_WRITE_ONLY}
 			});
+			//cl_run(cl_draw, ());
 			map_redraw(sdl);
 			sdl_run(sdl);
-			if (sdl->display_mm)
+			if (sdl->minimap.display)
 				display_minimap(sdl, map, cam.origin);
 		}
 		loop = sdl_events(map, sdl, &cam);
@@ -94,21 +95,24 @@ int			main(int ac, char **av)
 {
 	char	map[MAP_SIZE][MAP_SIZE];
 	t_cl	cl;
+	t_cl	cl_draw;
 	t_sdl	sdl;
 
 	if (ac != 2)
 		errors(ERR_USAGE, "bad number of args");
-
-	ft_bzero(&cl, sizeof(cl));
-	ft_bzero(&sdl, sizeof(sdl));
 	ft_bzero(&map, sizeof(map));
+	ft_bzero(&cl, sizeof(cl));
+	ft_bzero(&cl_draw, sizeof(cl));
+	ft_bzero(&sdl, sizeof(sdl));
 
 	parse_map(av[1], (void*)map);
 
-	cl_init(&cl, 1, (t_arg[1]) {(t_arg) {map, sizeof(map), CL_MEM_READ_ONLY}});
 	sdl_init(&sdl, PROGRAM_NAME);
+	cl_init(&cl, 1, (t_arg[1]) {(t_arg) {map, sizeof(map), CL_MEM_READ_ONLY}});
+	cl_init(&cl_draw, 1, (t_arg[1]) {(t_arg) {sdl.texture, \
+		sdl.texture->h * sdl.texture->w, CL_MEM_READ_ONLY}});
 
-	main_loop(map, &cl, &sdl);
+	main_loop(map, &cl, &sdl); //&cl_draw,
 
 	cl_end(&cl);
 	sdl_end(&sdl);

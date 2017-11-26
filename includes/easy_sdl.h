@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/28 11:55:45 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/11/25 20:44:13 by angavrel         ###   ########.fr       */
+/*   Updated: 2017/11/26 17:51:24 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,15 +43,21 @@ typedef struct			s_xy
 	int					y;
 }						t_xy;
 
+typedef struct			s_minimap
+{
+	int					display;
+	int					radius;
+}						t_minimap;
+
 typedef struct			s_sdl
 {
 	SDL_Window			*window;
 	SDL_Surface			*screen;
 	SDL_Surface			*draw_surface;
-	t_xy				size;
+	SDL_Surface			*texture;
 	uint32_t			*pixels;
-	int					display_mm;
-	int					radius;
+	t_xy				size;
+	t_minimap			minimap;
 }						t_sdl;
 
 void					sdl_init(t_sdl *sdl, const char *window_name);

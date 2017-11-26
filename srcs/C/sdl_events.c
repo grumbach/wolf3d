@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/12 12:49:22 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/11/26 17:30:29 by angavrel         ###   ########.fr       */
+/*   Updated: 2017/11/26 17:59:49 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ static void			move_cam(const char map[MAP_SIZE][MAP_SIZE], t_cam *cam, \
 }
 
 static void			sdl_keyboard(SDL_Event *event, \
-	const char map[MAP_SIZE][MAP_SIZE], t_cam *cam, t_sdl *sdl)
+	const char map[MAP_SIZE][MAP_SIZE], t_cam *cam, t_minimap *minimap)
 {
 	const Uint8		*state = SDL_GetKeyboardState(NULL);
 
@@ -69,12 +69,12 @@ static void			sdl_keyboard(SDL_Event *event, \
 		move_cam(map, cam, MOVE_SPEED / 2, 0);
 	if (state[SDL_SCANCODE_ESCAPE])
 		event->type = EVENT_STOP;
-	if (state[SDL_SCANCODE_KP_PLUS] && sdl->radius > 5)
-		--sdl->radius;
-	else if (state[SDL_SCANCODE_KP_MINUS] && sdl->radius < 20)
-		++sdl->radius;
+	if (state[SDL_SCANCODE_KP_PLUS] && minimap->radius > 5)
+		--minimap->radius;
+	else if (state[SDL_SCANCODE_KP_MINUS] && minimap->radius < 20)
+		++minimap->radius;
 	if (state[SDL_SCANCODE_M] && event->type == SDL_KEYDOWN)
-		sdl->display_mm = !sdl->display_mm;
+		minimap->display = !minimap->display;
 }
 
 static int			sdl_mouse(t_sdl *sdl, t_cam *cam)
@@ -105,7 +105,7 @@ int					sdl_events(const char map[MAP_SIZE][MAP_SIZE], t_sdl *sdl,
 			window_size = sdl->size;
 			return (sdl_init_window(sdl));
 		}
-		sdl_keyboard(&event, map, cam, sdl);
+		sdl_keyboard(&event, map, cam, &sdl->minimap);
 		return (event.type |= (event.type == EVENT_STOP) ?
 						0 : sdl_mouse(sdl, cam));
 	}

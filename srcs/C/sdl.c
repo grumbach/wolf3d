@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/21 15:24:34 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/11/25 20:42:10 by angavrel         ###   ########.fr       */
+/*   Updated: 2017/11/26 17:56:42 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@ void				sdl_init(t_sdl *sdl, const char *window_name)
 {
 	if (TTF_Init() || SDL_Init(SDL_INIT_VIDEO))
 		errors(ERR_SDL, "Init failed --");
+	if (!(sdl->texture = IMG_Load(WALL)))
+		errors(ERR_SDL, "Failed to load texture: "WALL);
 	if (!(sdl->window = SDL_CreateWindow(window_name, SDL_WINDOWPOS_CENTERED, \
 	SDL_WINDOWPOS_CENTERED, sdl->size.x, sdl->size.y, SDL_WINDOW_RESIZABLE)))
 		errors(ERR_SDL, "SDL_CreateWindow failed --");
@@ -40,7 +42,7 @@ void				sdl_init(t_sdl *sdl, const char *window_name)
 	sdl_init_window(sdl);
 	SDL_WarpMouseInWindow(sdl->window, sdl->size.x / 2, sdl->size.y / 2);
 	SDL_ShowCursor(SDL_DISABLE);
-	sdl->radius = 18;
+	sdl->minimap.radius = 18;
 }
 
 void				sdl_run(t_sdl *sdl)
@@ -57,6 +59,7 @@ void				sdl_end(t_sdl *sdl)
 	free(sdl->pixels);
 	SDL_FreeSurface(sdl->screen);
 	SDL_FreeSurface(sdl->draw_surface);
+	SDL_FreeSurface(sdl->texture);
 	SDL_DestroyWindow(sdl->window);
 	SDL_Quit();
 }

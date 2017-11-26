@@ -6,7 +6,7 @@
 /*   By: angavrel <angavrel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/11/25 15:21:14 by angavrel          #+#    #+#             */
-/*   Updated: 2017/11/26 17:35:56 by angavrel         ###   ########.fr       */
+/*   Updated: 2017/11/26 17:54:51 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void		display_minimap(t_sdl *sdl, const char map[MAP_SIZE][MAP_SIZE], \
 								t_vector pos)
 {
 	const int		mm_size = 180;
-	const int		block = mm_size / sdl->radius;
+	const int		block = mm_size / sdl->minimap.radius;
 	SDL_Surface		*minimap;
 	SDL_Surface		*me;
 	SDL_Rect		offset;
