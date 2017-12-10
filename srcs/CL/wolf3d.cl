@@ -1,11 +1,11 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   rt.cl                                              :+:      :+:    :+:   */
+/*   wolf3d.cl                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
+/*   By: angavrel <angavrel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/06/18 23:53:40 by agrumbac          #+#    #+#             */
+/*   Created: 2017/06/18 23:53:40 by angavrel          #+#    #+#             */
 /*   Updated: 2017/06/27 21:51:41 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -50,11 +50,37 @@ static float			get_height(const t_vector origin, __constant char *map, \
 	 	/ (float)2) / (float)((float *)&rayDir)[*side]));
 }
 
-__kernel void		core(__constant char *map, __constant t_cam *cam, \
-					__global uint *wall_height, __global uint *wall_color)
+static void			put_pixel(__global uint *pixels, const int x, const int y,
+	 					const uint color)
 {
-	const int 		x = get_global_id(0) ;
-	const float		cameraX = 2 * x / (float)get_global_size(0) - 1;
+	const int 		size_x = get_global_size(0);
+	const int 		size_y = get_global_size(1);
+	uint			(*pixel)[size_y][size_x] = (void*)pixels;
+
+	(*pixel)[y][x] = color;
+}
+
+static uint			get_color_on_texture(__global uint *textures, \
+						const int texture_number, const int x, const int y)
+{
+	const uint		(*texture)[4][TEXTURE_SIZE * TEXTURE_SIZE] = (void*)textures;
+
+	return ((*texture)[texture_number][y * TEXTURE_SIZE + x]);
+}
+
+static int			get_wall_direction()
+{
+	return (0);//0, 1, 2, 3 NSEW
+}
+
+__kernel void		core(__constant char *map, __global uint *textures,
+						__constant t_cam *cam, __global uint *pixels)
+{
+	const int 		x = get_global_id(0);
+	const int 		y = get_global_id(1);
+	const int 		size_y = get_global_size(1);
+
+	const float		cameraX = 2 * x / (float)x - 1;
 	const t_vector	rayDir =
 	{
 		cam->direction.x + cam->plane.x * cameraX,
@@ -64,7 +90,19 @@ __kernel void		core(__constant char *map, __constant t_cam *cam, \
 	const float 	wallDist = get_height(cam->origin, map, rayDir, &side);
 	const float 	wallX = ((float *)&cam->origin)[1 - side] \
 						+ wallDist * ((float *)&rayDir)[1 - side];
+	const uint		wall_height = size_y / wallDist;
 
-	wall_height[x] = cam->screen_height / wallDist;
-	wall_color[x] = 0xff000000 | (int)(((wallX - (int)wallX) * 0xff)) << 16;
+	int				color;
+	if (abs(y - size_y / 2) < wall_height / 2)
+	{
+		const int		wall_direction = get_wall_direction();
+		const int		wall_x = (uint)((wallX - (int)wallX) * TEXTURE_SIZE);
+		const int		wall_y = 42;
+		color = get_color_on_texture(textures, wall_direction, wall_x, wall_y);
+	}
+	else if (y < size_y / 2)
+		color = SKYBOX;
+	else
+		color = GROUND;
+	put_pixel(pixels, x, y, color);
 }

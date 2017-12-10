@@ -3,3 +3,5 @@
 .D*
 *.dSYM
 libft
+a.out
+test.c

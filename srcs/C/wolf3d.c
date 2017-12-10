@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:52:41 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/11/26 17:58:44 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/12/10 20:30:58 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,67 +14,31 @@
 
 /*
 ** cl_run has 4 args
-**     - [r--] the map
-**     - [r--] the camera
-**     - [-w-] wall_heights
-**       (written in the first line of pixeltab, for memory efficiency)
-**     - [-w-] wall_colors
-**       (written in the middle of pixeltab, they won't need to change color..)
+**     - const[r--] the map
+**     - const[r--] the textures
+**     -      [r--] the camera
+**     -      [-w-] the pixels
 */
 
-static void	map_redraw(t_sdl *sdl)
-{
-	t_xy		i;
-	uint		wall_color;
-	int			height;
-	int			step;
-
-	uint32_t(*pixels)[sdl->size.y][sdl->size.x];
-	pixels = (void*)sdl->pixels;
-	i = (t_xy){sdl->size.x, sdl->size.y};
-	while (i.x--)
-	{
-		i.y = sdl->size.y;
-		wall_color = (*pixels)[sdl->size.y / 2][i.x];
-		height = (*pixels)[0][i.x] > (uint)sdl->size.y ? sdl->size.y : \
-			(int)(*pixels)[0][i.x];
-		step = sdl->size.y - ((sdl->size.y - height) / 2);
-		while (--i.y > step)
-			(*pixels)[i.y][i.x] = GROUND;
-		step = sdl->size.y - height - ((sdl->size.y - height) / 2);
-		i.y++;
-		while (--i.y > step)
-			(*pixels)[i.y][i.x] = wall_color;
-		i.y++;
-		while (--i.y >= 0)
-			(*pixels)[i.y][i.x] = SKYBOX;
-	}
-}
-
-static void	main_loop(const char map[MAP_SIZE][MAP_SIZE], t_cl *cl, /*t_cl *cl_draw,*/ t_sdl *sdl)
+static void	game_loop(const char map[MAP_SIZE][MAP_SIZE], t_cl *cl, t_sdl *sdl)
 {
 	t_cam		cam;
 	int			loop;
 
-	cam = (t_cam){(t_vector){22, 12}, (t_vector){-1, 0}, \
-				(t_vector){0, 0.66}, sdl->size.y, 0};
+	cam = (t_cam){(t_vector){22, 12}, (t_vector){-1, 0}, (t_vector){0, 0.66}};
 	loop = EVENT_UPDATE;
 	while (loop)
 	{
 		if (loop & EVENT_UPDATE)
 		{
-			cl_run(cl, (size_t[WORK_DIM]) {sdl->size.x}, 3, (t_arg[3])
+			cl_run(cl, (size_t[WORK_DIM]) {sdl->size.x, sdl->size.y}, 2, \
+			(t_arg[2])
 			{
-				(t_arg) {&cam, sizeof(t_cam), CL_MEM_READ_ONLY}, \
-				(t_arg) {sdl->pixels, sizeof(uint) * sdl->size.x, CL_MEM_WRITE_ONLY}, \
-				(t_arg) {(sdl->pixels + ((sdl->size.y / 2) * sdl->size.x)), \
-					sizeof(uint) * sdl->size.x, CL_MEM_WRITE_ONLY}
+				(t_arg) {&cam, sizeof(t_cam), CL_MEM_READ_ONLY},
+				(t_arg) {sdl->pixels, \
+					sizeof(uint) * sdl->size.x * sdl->size.y, CL_MEM_WRITE_ONLY}
 			});
-			//cl_run(cl_draw, ());
-			map_redraw(sdl);
-			sdl_run(sdl);
-			if (sdl->minimap.display)
-				display_minimap(sdl, map, cam.origin);
+			sdl_run(sdl, map, &cam);
 		}
 		loop = sdl_events(map, sdl, &cam);
 	}
@@ -91,31 +55,43 @@ static void	parse_map(const char *filename, void *map)
 	close(fd);
 }
 
+static void	game_init(const char map[MAP_SIZE][MAP_SIZE], t_cl *cl, t_sdl *sdl)
+{
+	uint32_t		textures[NB_TEXTURES][TEXTURE_SIZE * TEXTURE_SIZE];
+	int				i;
+	const size_t	map_size = MAP_SIZE * MAP_SIZE * sizeof(char);
+	const size_t	texture_size = \
+					TEXTURE_SIZE * TEXTURE_SIZE * sizeof(uint32_t);
+
+	ft_bzero(textures, sizeof(textures));
+	sdl_init(sdl, PROGRAM_NAME);
+	i = -1;
+	while (++i < NB_TEXTURES)
+		ft_memcpy(&(textures[i][0]), sdl->texture[i]->pixels, texture_size);
+	cl_init(cl, 2, (t_arg[2])
+	{
+		(t_arg) {(void *)map, map_size, CL_MEM_READ_ONLY},
+		(t_arg) {textures, NB_TEXTURES * texture_size, CL_MEM_READ_ONLY}
+	});
+}
+
 int			main(int ac, char **av)
 {
 	char	map[MAP_SIZE][MAP_SIZE];
 	t_cl	cl;
-	t_cl	cl_draw;
 	t_sdl	sdl;
 
 	if (ac != 2)
 		errors(ERR_USAGE, "bad number of args");
 	ft_bzero(&map, sizeof(map));
 	ft_bzero(&cl, sizeof(cl));
-	ft_bzero(&cl_draw, sizeof(cl));
 	ft_bzero(&sdl, sizeof(sdl));
-
 	parse_map(av[1], (void*)map);
 
-	sdl_init(&sdl, PROGRAM_NAME);
-	cl_init(&cl, 1, (t_arg[1]) {(t_arg) {map, sizeof(map), CL_MEM_READ_ONLY}});
-	cl_init(&cl_draw, 1, (t_arg[1]) {(t_arg) {sdl.texture, \
-		sdl.texture->h * sdl.texture->w, CL_MEM_READ_ONLY}});
-
-	main_loop(map, &cl, &sdl); //&cl_draw,
+	game_init(map, &cl, &sdl);
+	game_loop(map, &cl, &sdl);
 
 	cl_end(&cl);
 	sdl_end(&sdl);
-
 	return (EXIT_SUCCESS);
 }

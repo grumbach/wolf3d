@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/21 15:24:34 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/11/26 17:56:42 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/12/10 18:27:19 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,11 @@ void				sdl_init(t_sdl *sdl, const char *window_name)
 {
 	if (TTF_Init() || SDL_Init(SDL_INIT_VIDEO))
 		errors(ERR_SDL, "Init failed --");
-	if (!(sdl->texture = IMG_Load(WALL)))
-		errors(ERR_SDL, "Failed to load texture: "WALL);
+	if (!(sdl->texture[0] = IMG_Load(WALL0)) || \
+		!(sdl->texture[1] = IMG_Load(WALL1)) || \
+		!(sdl->texture[2] = IMG_Load(WALL2)) || \
+		!(sdl->texture[3] = IMG_Load(WALL3)))
+		errors(ERR_SDL, "Failed to load texture");
 	if (!(sdl->window = SDL_CreateWindow(window_name, SDL_WINDOWPOS_CENTERED, \
 	SDL_WINDOWPOS_CENTERED, sdl->size.x, sdl->size.y, SDL_WINDOW_RESIZABLE)))
 		errors(ERR_SDL, "SDL_CreateWindow failed --");
@@ -45,21 +48,34 @@ void				sdl_init(t_sdl *sdl, const char *window_name)
 	sdl->minimap.radius = 18;
 }
 
-void				sdl_run(t_sdl *sdl)
+void				sdl_run(t_sdl *sdl, const char map[MAP_SIZE][MAP_SIZE], t_cam *cam)
 {
 	SDL_WarpMouseInWindow(sdl->window, sdl->size.x / 2, sdl->size.y / 2);
 	if (SDL_BlitSurface(sdl->draw_surface, NULL, sdl->screen, NULL))
 		errors(ERR_SDL, "SDL_BlitSurface failed --");
+	if (sdl->minimap.display)
+		display_minimap(sdl, map, cam->origin);
 	if (SDL_UpdateWindowSurface(sdl->window))
 		errors(ERR_SDL, "SDL_UpdateWindowSurface failed --");
 }
 
+/*
+** -- sdl_end() --
+** sdl->texture is of type SDL_Surface* [NB_TEXTURES + 1]
+** It is NULL terminated.
+** Since sdl->texture is not to be used again (freed), it is safe to modify it
+*/
+
 void				sdl_end(t_sdl *sdl)
 {
+	int			i;
+
+	i = 0;
 	free(sdl->pixels);
 	SDL_FreeSurface(sdl->screen);
 	SDL_FreeSurface(sdl->draw_surface);
-	SDL_FreeSurface(sdl->texture);
+	while (sdl->texture[i])
+		SDL_FreeSurface(sdl->texture[i++]);
 	SDL_DestroyWindow(sdl->window);
 	SDL_Quit();
 }

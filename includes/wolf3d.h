@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:53:40 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/11/26 17:47:55 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/12/10 20:35:11 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,15 @@
 # include "libft.h"
 # include "easy_cl.h"
 # include "easy_sdl.h"
+# include "wolf3d_c_cl.h"
 
 # define WIN_H				640
 # define WIN_W				1024
-# define MAP_SIZE			24
 
-# define SKYBOX				0xff333333
-# define GROUND				0xff666666
-# define WALL				"textures/wall7.jpg"
+# define WALL0				"textures/wall.jpg"
+# define WALL1				"textures/wall2.jpg"
+# define WALL2				"textures/wall3.jpg"
+# define WALL3				"textures/wall4.jpg"
 
 /*
 ** ********************************** errors ***********************************
@@ -74,12 +75,12 @@ typedef struct			s_cam
 	t_vector			origin;
 	t_vector			direction;
 	t_vector			plane;
-	uint				screen_height;
-	uint32_t			padding_opencl;
 }						t_cam;
 
+void					sdl_run(t_sdl *sdl, const char map[MAP_SIZE][MAP_SIZE],
+							t_cam *cam);
 int						sdl_events(const char map[MAP_SIZE][MAP_SIZE], \
-										t_sdl *sdl, t_cam *cam);
+							t_sdl *sdl, t_cam *cam);
 
 /*
 ** *****************************************************************************
@@ -87,6 +88,6 @@ int						sdl_events(const char map[MAP_SIZE][MAP_SIZE], \
 
 long					errors(const int err, const char *comment);
 void					display_minimap(t_sdl *sdl, \
-		const char map[MAP_SIZE][MAP_SIZE], t_vector pos);
+							const char map[MAP_SIZE][MAP_SIZE], t_vector pos);
 
 #endif
