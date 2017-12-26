@@ -6,7 +6,7 @@
 #    By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/05/25 11:36:26 by agrumbac          #+#    #+#              #
-#    Updated: 2017/11/25 15:30:35 by angavrel         ###   ########.fr        #
+#    Updated: 2017/12/26 23:21:39 by Anselme          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,7 @@ OBJDIR = objs
 CFLAGS = -Wall -Wextra -Werror -g
 
 DEP = libft/includes/libft.h includes/wolf3d.h \
-	includes/easy_cl.h includes/easy_sdl.h
+	includes/easy_cl.h includes/easy_sdl.h includes/wolf3d_c_cl.h
 
 CC = clang #/Users/agrumbac/.brew/bin/gcc-7
 

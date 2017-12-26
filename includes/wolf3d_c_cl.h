@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/10 17:11:56 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/12/26 20:14:36 by Anselme          ###   ########.fr       */
+/*   Updated: 2017/12/26 23:23:01 by Anselme          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 # define WALLSKYBLUE		0xff51bdff
 # define WALLPINK			0xffa90e64
 # define WALLCRIMSONRED		0xffb00718
+# define WALLGREY			0xff666666
+# define WALLDARKGREY		0xff333333
 
-# define SKYBOX				WALLMIDNIGHTBLUE	//0xff333333
-# define GROUND				WALLCRIMSONRED	//0xff666666
+# define SKYBOX				WALLGREY
+# define GROUND				WALLDARKGREY

@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:52:41 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/12/26 20:56:28 by Anselme          ###   ########.fr       */
+/*   Updated: 2017/12/26 23:13:39 by Anselme          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,21 +20,19 @@
 **     -      [-w-] the pixels
 */
 
-static uint	get_wall_color(t_sdl *sdl, const uint dir, const float wall_index)
+static uint	get_wall_color(t_sdl *sdl, const uint dir, \
+				const float wall_x, const uint wall_y)
 {
-	// uint		(*textures)[NB_TEXTURES][TEXTURE_SIZE * TEXTURE_SIZE];
+	uint	(*texture)[TEXTURE_SIZE][TEXTURE_SIZE];
 
-	// textures = (void*)sdl->texture;
-	// textures
-	(void)dir;
-	(void)sdl;
-	return 0xff000000 | (int)(wall_index * 0xff) << 16;
+	texture = (void *)sdl->texture[dir]->pixels;
+	return (*texture)[(int)(wall_x * TEXTURE_SIZE)][wall_y];
 }
 
 static void	map_redraw(t_sdl *sdl)
 {
 	t_xy		i;
-	uint		wall_color;
+	float		wall_index;
 	int			height;
 	int			step;
 
@@ -44,7 +42,7 @@ static void	map_redraw(t_sdl *sdl)
 	while (i.x--)
 	{
 		i.y = sdl->size.y;
-		wall_color = get_wall_color(sdl, 0, *((float *)&((*pixels)[sdl->size.y / 2][i.x])));
+		wall_index = *((float *)&((*pixels)[sdl->size.y / 2][i.x]));
 		height = (*pixels)[0][i.x] > (uint)sdl->size.y ? sdl->size.y : \
 			(int)(*pixels)[0][i.x];
 		step = sdl->size.y - ((sdl->size.y - height) / 2);
@@ -53,7 +51,8 @@ static void	map_redraw(t_sdl *sdl)
 		step = sdl->size.y - height - ((sdl->size.y - height) / 2);
 		i.y++;
 		while (--i.y > step)
-			(*pixels)[i.y][i.x] = wall_color;
+			(*pixels)[i.y][i.x] = get_wall_color(sdl, 3, wall_index, \
+				(abs(i.y - sdl->size.y / 2 - height / 2) / (float)height) * TEXTURE_SIZE);
 		i.y++;
 		while (--i.y >= 0)
 			(*pixels)[i.y][i.x] = SKYBOX;
@@ -92,7 +91,7 @@ static void	parse_map(const char *filename, void *map)
 
 	if ((fd = open(filename, O_RDONLY)) < 0)
 		errors(ERR_SYS, 0);
-	if (read(fd, (void*)map, MAP_SIZE * MAP_SIZE) != MAP_SIZE * MAP_SIZE)
+	if (read(fd, map, MAP_SIZE * MAP_SIZE) != MAP_SIZE * MAP_SIZE)
 		errors(ERR_USAGE, "Map too small");
 	close(fd);
 }
