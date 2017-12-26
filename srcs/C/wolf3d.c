@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:52:41 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/12/10 20:30:58 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/12/26 20:56:28 by Anselme          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,24 +20,66 @@
 **     -      [-w-] the pixels
 */
 
+static uint	get_wall_color(t_sdl *sdl, const uint dir, const float wall_index)
+{
+	// uint		(*textures)[NB_TEXTURES][TEXTURE_SIZE * TEXTURE_SIZE];
+
+	// textures = (void*)sdl->texture;
+	// textures
+	(void)dir;
+	(void)sdl;
+	return 0xff000000 | (int)(wall_index * 0xff) << 16;
+}
+
+static void	map_redraw(t_sdl *sdl)
+{
+	t_xy		i;
+	uint		wall_color;
+	int			height;
+	int			step;
+
+	uint32_t(*pixels)[sdl->size.y][sdl->size.x];
+	pixels = (void*)sdl->pixels;
+	i = (t_xy){sdl->size.x, sdl->size.y};
+	while (i.x--)
+	{
+		i.y = sdl->size.y;
+		wall_color = get_wall_color(sdl, 0, *((float *)&((*pixels)[sdl->size.y / 2][i.x])));
+		height = (*pixels)[0][i.x] > (uint)sdl->size.y ? sdl->size.y : \
+			(int)(*pixels)[0][i.x];
+		step = sdl->size.y - ((sdl->size.y - height) / 2);
+		while (--i.y > step)
+			(*pixels)[i.y][i.x] = GROUND;
+		step = sdl->size.y - height - ((sdl->size.y - height) / 2);
+		i.y++;
+		while (--i.y > step)
+			(*pixels)[i.y][i.x] = wall_color;
+		i.y++;
+		while (--i.y >= 0)
+			(*pixels)[i.y][i.x] = SKYBOX;
+	}
+}
+
 static void	game_loop(const char map[MAP_SIZE][MAP_SIZE], t_cl *cl, t_sdl *sdl)
 {
 	t_cam		cam;
 	int			loop;
 
-	cam = (t_cam){(t_vector){22, 12}, (t_vector){-1, 0}, (t_vector){0, 0.66}};
+	cam = (t_cam){(t_vector){22, 12}, (t_vector){-1, 0}, \
+				(t_vector){0, 0.66}, sdl->size.y, 42};
 	loop = EVENT_UPDATE;
 	while (loop)
 	{
 		if (loop & EVENT_UPDATE)
 		{
-			cl_run(cl, (size_t[WORK_DIM]) {sdl->size.x, sdl->size.y}, 2, \
-			(t_arg[2])
+			cl_run(cl, (size_t[WORK_DIM]) {sdl->size.x}, 3, (t_arg[3])
 			{
-				(t_arg) {&cam, sizeof(t_cam), CL_MEM_READ_ONLY},
-				(t_arg) {sdl->pixels, \
-					sizeof(uint) * sdl->size.x * sdl->size.y, CL_MEM_WRITE_ONLY}
+				(t_arg) {&cam, sizeof(t_cam), CL_MEM_READ_ONLY}, \
+				(t_arg) {sdl->pixels, sizeof(uint) * sdl->size.x, CL_MEM_WRITE_ONLY}, \
+				(t_arg) {(sdl->pixels + ((sdl->size.y / 2) * sdl->size.x)), \
+					sizeof(uint) * sdl->size.x, CL_MEM_WRITE_ONLY}
 			});
+			map_redraw(sdl);
 			sdl_run(sdl, map, &cam);
 		}
 		loop = sdl_events(map, sdl, &cam);

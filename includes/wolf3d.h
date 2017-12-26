@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:53:40 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/12/10 20:35:11 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/12/26 20:15:28 by Anselme          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,8 @@ typedef struct			s_cam
 	t_vector			origin;
 	t_vector			direction;
 	t_vector			plane;
+	uint				screen_height;
+	uint				padding;
 }						t_cam;
 
 void					sdl_run(t_sdl *sdl, const char map[MAP_SIZE][MAP_SIZE],

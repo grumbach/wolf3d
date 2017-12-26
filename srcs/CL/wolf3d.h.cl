@@ -37,6 +37,7 @@ typedef struct			s_cam
 	t_vector			origin;
 	t_vector			direction;
 	t_vector			plane;
+	uint				screen_height;
 }						t_cam;
 
 #endif

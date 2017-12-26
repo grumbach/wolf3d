@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/28 11:54:05 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/12/10 18:37:43 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/12/26 20:25:27 by Anselme          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,8 @@
 # define CL_KERNEL_NAME		"core"
 # define CL_CC_FLAGS		"-I. -Isrcs/CL -cl-mad-enable -cl-fast-relaxed-math"
 # define CL_DEVICE			CL_DEVICE_TYPE_CPU
-# define MAX_KERNEL_ARGS	4
-# define WORK_DIM			2
+# define MAX_KERNEL_ARGS	5
+# define WORK_DIM			1
 
 typedef struct			s_arg
 {
