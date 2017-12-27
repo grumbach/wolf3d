@@ -35,10 +35,10 @@
 # define WIN_H				640
 # define WIN_W				1024
 
-# define WALL0				"textures/wall.jpg"
-# define WALL1				"textures/wall2.jpg"
-# define WALL2				"textures/wall3.jpg"
-# define WALL3				"textures/wall4.jpg"
+# define WALL0				"textures/sci.jpg"
+# define WALL1				"textures/wall8.jpg"
+# define WALL2				"textures/doom.png"
+# define WALL3				"textures/door.jpg"
 
 /*
 ** ********************************** errors ***********************************
