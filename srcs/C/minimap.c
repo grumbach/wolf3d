@@ -12,6 +12,17 @@
 
 #include "wolf3d.h"
 
+void		parse_map(const char *filename, void *map)
+{
+	int		fd;
+
+	if ((fd = open(filename, O_RDONLY)) < 0)
+		errors(ERR_SYS, 0);
+	if (read(fd, map, MAP_SIZE * MAP_SIZE) != MAP_SIZE * MAP_SIZE)
+		errors(ERR_USAGE, "Map too small");
+	close(fd);
+}
+
 static void	draw_walls(const char map[MAP_SIZE][MAP_SIZE], SDL_Surface *minimap,
 	t_vector pos, const int block)
 {

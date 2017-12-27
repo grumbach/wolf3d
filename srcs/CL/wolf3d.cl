@@ -13,13 +13,13 @@
 # include "wolf3d.h.cl"
 
 static float			get_height(const t_vector origin, __constant char *map, \
-									const t_vector rayDir, int *side)
+									const float rayDir[2], int *side)
 {
 	char			(*maps)[MAP_SIZE][MAP_SIZE] = (void*)map;
 	const t_vector		deltaDist =
 	{
-		sqrt(1 + (rayDir.y * rayDir.y) / (float)(rayDir.x * rayDir.x)),
-		sqrt(1 + (rayDir.x * rayDir.x) / (float)(rayDir.y * rayDir.y))
+		sqrt(1 + (rayDir[1] * rayDir[1]) / (float)(rayDir[0] * rayDir[0])),
+		sqrt(1 + (rayDir[0] * rayDir[0]) / (float)(rayDir[1] * rayDir[1]))
 	};
 	t_xy				mapPos =
 	{
@@ -28,8 +28,8 @@ static float			get_height(const t_vector origin, __constant char *map, \
 	};
 	const t_xy			step =
 	{
-		(rayDir.x < 0) ? -1 : 1,
-		(rayDir.y < 0) ? -1 : 1
+		(rayDir[0] < 0) ? -1 : 1,
+		(rayDir[1] < 0) ? -1 : 1
 	};
 	t_vector			sideDist =
 	{
@@ -47,25 +47,7 @@ static float			get_height(const t_vector origin, __constant char *map, \
 	}
 	return ((float)((((int *)&mapPos)[*side] - \
 		((float *)&origin)[*side] + (1 - ((int *)&step)[*side]) \
-	 	/ (float)2) / (float)((float *)&rayDir)[*side]));
-}
-
-static uint			get_dir(const t_vector rayDir, const int side)
-{
-	if (side)
-	{
-		if (rayDir.y > 0)
-			return (0);
-		else
-			return (1);
-	}
-	else
-	{
-		if (rayDir.x > 0)
-			return (2);
-		else
-			return (3);
-	}
+	 	/ (float)2) / rayDir[*side]));
 }
 
 __kernel void		core(__constant char *map, __global uint *textures, \
@@ -74,7 +56,7 @@ __kernel void		core(__constant char *map, __global uint *textures, \
 {
 	const int 		x = get_global_id(0) ;
 	const float		cameraX = 2 * x / (float)get_global_size(0) - 1;
-	const t_vector	rayDir =
+	const float		rayDir[2] =
 	{
 		cam->direction.x + cam->plane.x * cameraX,
 		cam->direction.y + cam->plane.y * cameraX
@@ -82,9 +64,9 @@ __kernel void		core(__constant char *map, __global uint *textures, \
 	int				side;
 	const float 	wallDist = get_height(cam->origin, map, rayDir, &side);
 	const float 	wallX = ((float *)&cam->origin)[1 - side] \
-						+ wallDist * ((float *)&rayDir)[1 - side];
+						+ wallDist * rayDir[1 - side];
 
 	wall_height[x] = cam->screen_height / wallDist;
 	wall_index[x] = wallX - (int)wallX;
-	wall_dir[x] = get_dir(rayDir, side);
+	wall_dir[x] = (((rayDir)[side] < 0) + side * 2);
 }

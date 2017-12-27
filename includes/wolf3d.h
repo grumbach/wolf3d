@@ -90,6 +90,7 @@ int						sdl_events(const char map[MAP_SIZE][MAP_SIZE], \
 */
 
 long					errors(const int err, const char *comment);
+void					parse_map(const char *filename, void *map);
 void					display_minimap(t_sdl *sdl, \
 							const char map[MAP_SIZE][MAP_SIZE], t_vector pos);
 

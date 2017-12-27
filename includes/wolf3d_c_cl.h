@@ -10,6 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#ifndef WOLF3D_C_CL_H
+# define WOLF3D_C_CL_H
+
 # define MAP_SIZE			24
 # define TEXTURE_SIZE		512
 
@@ -22,3 +25,5 @@
 
 # define SKYBOX				WALLGREY
 # define GROUND				WALLDARKGREY
+
+#endif

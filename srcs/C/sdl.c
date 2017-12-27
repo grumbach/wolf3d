@@ -48,7 +48,8 @@ void				sdl_init(t_sdl *sdl, const char *window_name)
 	sdl->settings = WOLF_TOGGLE;
 }
 
-void				sdl_run(t_sdl *sdl, const char map[MAP_SIZE][MAP_SIZE], t_cam *cam)
+void				sdl_run(t_sdl *sdl, const char map[MAP_SIZE][MAP_SIZE], \
+						t_cam *cam)
 {
 	if (WOLF_LOCK_MOUSE(sdl->settings))
 	{

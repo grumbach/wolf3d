@@ -20,22 +20,22 @@
 **     -      [-w-] the pixels
 */
 
-static uint	get_wall_color(t_sdl *sdl, const uint dir, \
-				const float wall_x, const uint wall_y)
+static uint				get_wall_color(t_sdl *sdl, const uint dir, \
+							const float wall_x, const uint wall_y)
 {
-	uint	(*texture)[TEXTURE_SIZE][TEXTURE_SIZE];
+	uint				(*texture)[TEXTURE_SIZE][TEXTURE_SIZE];
 
 	texture = (void *)sdl->texture[dir]->pixels;
 	return (*texture)[(int)(wall_x * TEXTURE_SIZE)][wall_y];
 }
 
-static void	map_redraw(t_sdl *sdl)
+static void				map_redraw(t_sdl *sdl)
 {
-	t_xy		i;
-	float		wall_index;
-	int			wall_dir;
-	int			height;
-	int			step;
+	t_xy				i;
+	float				wall_index;
+	int					wall_dir;
+	int					height;
+	int					step;
 
 	uint32_t(*pixels)[sdl->size.y][sdl->size.x];
 	pixels = (void*)sdl->pixels;
@@ -50,11 +50,11 @@ static void	map_redraw(t_sdl *sdl)
 		step = sdl->size.y - ((sdl->size.y - height) / 2);
 		while (--i.y > step)
 			(*pixels)[i.y][i.x] = GROUND;
-		step = sdl->size.y - height - ((sdl->size.y - height) / 2);
+		step -= height;
 		i.y++;
 		while (--i.y > step)
 			(*pixels)[i.y][i.x] = get_wall_color(sdl, wall_dir, wall_index, \
-				(abs(i.y - sdl->size.y / 2 - height / 2) / (float)height) * TEXTURE_SIZE);
+			(abs(i.y - sdl->size.y / 2 - height / 2) / (float)height) * TEXTURE_SIZE);
 		i.y++;
 		while (--i.y >= 0)
 			(*pixels)[i.y][i.x] = SKYBOX;
@@ -69,10 +69,25 @@ static void	map_redraw(t_sdl *sdl)
 **     last line for uint* wall_dir (NSWE direction 0, 1, 2, 3)
 */
 
-static void	game_loop(const char map[MAP_SIZE][MAP_SIZE], t_cl *cl, t_sdl *sdl)
+static inline void	cluster_run(t_cl *cl, t_sdl *sdl, t_cam *cam)
 {
-	t_cam		cam;
-	int			loop;
+	const t_arg		args[4] =
+	{
+		(t_arg) {cam, sizeof(t_cam), CL_MEM_READ_ONLY}, \
+		(t_arg) {sdl->pixels, sizeof(uint) * sdl->size.x, CL_MEM_WRITE_ONLY}, \
+		(t_arg) {(sdl->pixels + ((sdl->size.y / 2) * sdl->size.x)), \
+			sizeof(uint) * sdl->size.x, CL_MEM_WRITE_ONLY}, \
+		(t_arg) {sdl->pixels + sdl->size.y * sdl->size.x - sdl->size.x, \
+			sizeof(uint) * sdl->size.x, CL_MEM_WRITE_ONLY}
+	};
+	cl_run(cl, (size_t[WORK_DIM]) {sdl->size.x}, 4, args);
+}
+
+static void			game_loop(const char map[MAP_SIZE][MAP_SIZE], \
+						t_cl *cl, t_sdl *sdl)
+{
+	t_cam			cam;
+	int				loop;
 
 	cam = (t_cam){(t_vector){22, 12}, (t_vector){-1, 0}, \
 				(t_vector){0, 0.66}, sdl->size.y, 42};
@@ -81,15 +96,7 @@ static void	game_loop(const char map[MAP_SIZE][MAP_SIZE], t_cl *cl, t_sdl *sdl)
 	{
 		if (loop & EVENT_UPDATE)
 		{
-			cl_run(cl, (size_t[WORK_DIM]) {sdl->size.x}, 4, (t_arg[4])
-			{
-				(t_arg) {&cam, sizeof(t_cam), CL_MEM_READ_ONLY}, \
-				(t_arg) {sdl->pixels, sizeof(uint) * sdl->size.x, CL_MEM_WRITE_ONLY}, \
-				(t_arg) {(sdl->pixels + ((sdl->size.y / 2) * sdl->size.x)), \
-					sizeof(uint) * sdl->size.x, CL_MEM_WRITE_ONLY}, \
-				(t_arg) {sdl->pixels + sdl->size.y * sdl->size.x - sdl->size.x, \
-					sizeof(uint) * sdl->size.x, CL_MEM_WRITE_ONLY}
-			});
+			cluster_run(cl, sdl, &cam);
 			map_redraw(sdl);
 			sdl_run(sdl, map, &cam);
 		}
@@ -97,42 +104,32 @@ static void	game_loop(const char map[MAP_SIZE][MAP_SIZE], t_cl *cl, t_sdl *sdl)
 	}
 }
 
-static void	parse_map(const char *filename, void *map)
-{
-	int		fd;
-
-	if ((fd = open(filename, O_RDONLY)) < 0)
-		errors(ERR_SYS, 0);
-	if (read(fd, map, MAP_SIZE * MAP_SIZE) != MAP_SIZE * MAP_SIZE)
-		errors(ERR_USAGE, "Map too small");
-	close(fd);
-}
-
-static void	game_init(const char map[MAP_SIZE][MAP_SIZE], t_cl *cl, t_sdl *sdl)
+static void			game_init(const char map[MAP_SIZE][MAP_SIZE], \
+						t_cl *cl, t_sdl *sdl)
 {
 	uint32_t		textures[NB_TEXTURES][TEXTURE_SIZE * TEXTURE_SIZE];
 	int				i;
 	const size_t	map_size = MAP_SIZE * MAP_SIZE * sizeof(char);
-	const size_t	texture_size = \
-					TEXTURE_SIZE * TEXTURE_SIZE * sizeof(uint32_t);
+	const size_t	texture_size = TEXTURE_SIZE * TEXTURE_SIZE * sizeof(uint);
 
+	const t_arg		args[2] =
+	{
+		(t_arg) {(void *)map, map_size, CL_MEM_READ_ONLY},
+		(t_arg) {textures, NB_TEXTURES * texture_size, CL_MEM_READ_ONLY}
+	};
 	ft_bzero(textures, sizeof(textures));
 	sdl_init(sdl, PROGRAM_NAME);
 	i = -1;
 	while (++i < NB_TEXTURES)
 		ft_memcpy(&(textures[i][0]), sdl->texture[i]->pixels, texture_size);
-	cl_init(cl, 2, (t_arg[2])
-	{
-		(t_arg) {(void *)map, map_size, CL_MEM_READ_ONLY},
-		(t_arg) {textures, NB_TEXTURES * texture_size, CL_MEM_READ_ONLY}
-	});
+	cl_init(cl, 2, args);
 }
 
-int			main(int ac, char **av)
+int					main(int ac, char **av)
 {
-	char	map[MAP_SIZE][MAP_SIZE];
-	t_cl	cl;
-	t_sdl	sdl;
+	char			map[MAP_SIZE][MAP_SIZE];
+	t_cl			cl;
+	t_sdl			sdl;
 
 	if (ac != 2)
 		errors(ERR_USAGE, "bad number of args");
@@ -140,10 +137,8 @@ int			main(int ac, char **av)
 	ft_bzero(&cl, sizeof(cl));
 	ft_bzero(&sdl, sizeof(sdl));
 	parse_map(av[1], (void*)map);
-
 	game_init(map, &cl, &sdl);
 	game_loop(map, &cl, &sdl);
-
 	cl_end(&cl);
 	sdl_end(&sdl);
 	return (EXIT_SUCCESS);
