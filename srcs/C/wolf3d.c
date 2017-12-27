@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:52:41 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/12/26 23:13:39 by Anselme          ###   ########.fr       */
+/*   Updated: 2017/12/27 17:40:46 by Anselme          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ static void	map_redraw(t_sdl *sdl)
 {
 	t_xy		i;
 	float		wall_index;
+	int			wall_dir;
 	int			height;
 	int			step;
 
@@ -43,6 +44,7 @@ static void	map_redraw(t_sdl *sdl)
 	{
 		i.y = sdl->size.y;
 		wall_index = *((float *)&((*pixels)[sdl->size.y / 2][i.x]));
+		wall_dir = (*pixels)[sdl->size.y - 1][i.x];
 		height = (*pixels)[0][i.x] > (uint)sdl->size.y ? sdl->size.y : \
 			(int)(*pixels)[0][i.x];
 		step = sdl->size.y - ((sdl->size.y - height) / 2);
@@ -51,13 +53,21 @@ static void	map_redraw(t_sdl *sdl)
 		step = sdl->size.y - height - ((sdl->size.y - height) / 2);
 		i.y++;
 		while (--i.y > step)
-			(*pixels)[i.y][i.x] = get_wall_color(sdl, 3, wall_index, \
+			(*pixels)[i.y][i.x] = get_wall_color(sdl, wall_dir, wall_index, \
 				(abs(i.y - sdl->size.y / 2 - height / 2) / (float)height) * TEXTURE_SIZE);
 		i.y++;
 		while (--i.y >= 0)
 			(*pixels)[i.y][i.x] = SKYBOX;
 	}
 }
+
+/*
+** NB sdl->pixels used in a wicked way : some lines used as exchange buffers
+** for cl_run() kernel :
+**     first line for uint * wall_height (in px)
+**     mid line for float * wall_index (hit index ratio 0 > x > 1)
+**     last line for uint* wall_dir (NSWE direction 0, 1, 2, 3)
+*/
 
 static void	game_loop(const char map[MAP_SIZE][MAP_SIZE], t_cl *cl, t_sdl *sdl)
 {
@@ -71,11 +81,13 @@ static void	game_loop(const char map[MAP_SIZE][MAP_SIZE], t_cl *cl, t_sdl *sdl)
 	{
 		if (loop & EVENT_UPDATE)
 		{
-			cl_run(cl, (size_t[WORK_DIM]) {sdl->size.x}, 3, (t_arg[3])
+			cl_run(cl, (size_t[WORK_DIM]) {sdl->size.x}, 4, (t_arg[4])
 			{
 				(t_arg) {&cam, sizeof(t_cam), CL_MEM_READ_ONLY}, \
 				(t_arg) {sdl->pixels, sizeof(uint) * sdl->size.x, CL_MEM_WRITE_ONLY}, \
 				(t_arg) {(sdl->pixels + ((sdl->size.y / 2) * sdl->size.x)), \
+					sizeof(uint) * sdl->size.x, CL_MEM_WRITE_ONLY}, \
+				(t_arg) {sdl->pixels + sdl->size.y * sdl->size.x - sdl->size.x, \
 					sizeof(uint) * sdl->size.x, CL_MEM_WRITE_ONLY}
 			});
 			map_redraw(sdl);

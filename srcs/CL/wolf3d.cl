@@ -50,9 +50,27 @@ static float			get_height(const t_vector origin, __constant char *map, \
 	 	/ (float)2) / (float)((float *)&rayDir)[*side]));
 }
 
+static uint			get_dir(const t_vector rayDir, const int side)
+{
+	if (side)
+	{
+		if (rayDir.y > 0)
+			return (0);
+		else
+			return (1);
+	}
+	else
+	{
+		if (rayDir.x > 0)
+			return (2);
+		else
+			return (3);
+	}
+}
+
 __kernel void		core(__constant char *map, __global uint *textures, \
 						__constant t_cam *cam, __global uint *wall_height, \
-						__global float *wall_color)
+						__global float *wall_index, __global uint *wall_dir)
 {
 	const int 		x = get_global_id(0) ;
 	const float		cameraX = 2 * x / (float)get_global_size(0) - 1;
@@ -67,5 +85,6 @@ __kernel void		core(__constant char *map, __global uint *textures, \
 						+ wallDist * ((float *)&rayDir)[1 - side];
 
 	wall_height[x] = cam->screen_height / wallDist;
-	wall_color[x] = wallX - (int)wallX;
+	wall_index[x] = wallX - (int)wallX;
+	wall_dir[x] = get_dir(rayDir, side);
 }
