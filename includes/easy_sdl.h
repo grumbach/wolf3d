@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/28 11:55:45 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/12/10 17:50:47 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/12/27 18:30:29 by Anselme          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,11 +44,10 @@ typedef struct			s_xy
 	int					y;
 }						t_xy;
 
-typedef struct			s_minimap
-{
-	int					display;
-	int					radius;
-}						t_minimap;
+# define WOLF_TOGGLE		0b1111
+# define WOLF_LOCK_MOUSE(i)	(0b1 & i)
+# define WOLF_SHOW_MAP(i)	(0b10 & i)
+# define WOLF_SHOW_FOG(i)	(0b100 & i)
 
 typedef struct			s_sdl
 {
@@ -58,7 +57,7 @@ typedef struct			s_sdl
 	SDL_Surface			*texture[NB_TEXTURES + 1];
 	uint32_t			*pixels;
 	t_xy				size;
-	t_minimap			minimap;
+	uint				settings;
 }						t_sdl;
 
 void					sdl_init(t_sdl *sdl, const char *window_name);

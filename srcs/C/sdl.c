@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/21 15:24:34 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/12/10 18:27:19 by agrumbac         ###   ########.fr       */
+/*   Updated: 2017/12/27 18:31:01 by Anselme          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,15 +45,21 @@ void				sdl_init(t_sdl *sdl, const char *window_name)
 	sdl_init_window(sdl);
 	SDL_WarpMouseInWindow(sdl->window, sdl->size.x / 2, sdl->size.y / 2);
 	SDL_ShowCursor(SDL_DISABLE);
-	sdl->minimap.radius = 18;
+	sdl->settings = WOLF_TOGGLE;
 }
 
 void				sdl_run(t_sdl *sdl, const char map[MAP_SIZE][MAP_SIZE], t_cam *cam)
 {
-	SDL_WarpMouseInWindow(sdl->window, sdl->size.x / 2, sdl->size.y / 2);
+	if (WOLF_LOCK_MOUSE(sdl->settings))
+	{
+		SDL_ShowCursor(SDL_DISABLE);
+		SDL_WarpMouseInWindow(sdl->window, sdl->size.x / 2, sdl->size.y / 2);
+	}
+	else
+		SDL_ShowCursor(SDL_ENABLE);
 	if (SDL_BlitSurface(sdl->draw_surface, NULL, sdl->screen, NULL))
 		errors(ERR_SDL, "SDL_BlitSurface failed --");
-	if (sdl->minimap.display)
+	if (WOLF_SHOW_MAP(sdl->settings))
 		display_minimap(sdl, map, cam->origin);
 	if (SDL_UpdateWindowSurface(sdl->window))
 		errors(ERR_SDL, "SDL_UpdateWindowSurface failed --");

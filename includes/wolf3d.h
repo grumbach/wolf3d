@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/18 23:53:40 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/12/26 20:15:28 by Anselme          ###   ########.fr       */
+/*   Updated: 2017/12/27 18:06:24 by Anselme          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@
 
 # define MOVE_SPEED			0.2
 # define TURN_SPEED			0.1
+# define MINIMAP_RADIUS		18
 
 typedef struct			s_vector
 {
