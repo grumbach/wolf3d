@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/12 12:49:22 by agrumbac          #+#    #+#             */
-/*   Updated: 2017/12/27 18:32:30 by Anselme          ###   ########.fr       */
+/*   Updated: 2018/01/30 16:03:33 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,21 +33,21 @@ static void			turn_cam(t_cam *cam, const float speed)
 static void			move_cam(const char map[MAP_SIZE][MAP_SIZE], t_cam *cam, \
 								const float speed, const int a)
 {
-	const t_vector	new = cam->origin;
+	const t_vector	old = cam->origin;
 
 	cam->origin.x += (a * cam->direction.x + (1 - a) * cam->plane.x) * speed;
 	cam->origin.y += (a * cam->direction.y + (1 - a) * cam->plane.y) * speed;
 	if (map[(int)cam->origin.x][(int)cam->origin.y] != '0')
 	{
-		if (map[(int)new.x][(int)cam->origin.y] != '0')
-			cam->origin.y = new.y;
-		else if (map[(int)cam->origin.x][(int)new.y] != '0')
-			cam->origin.x = new.x;
+		if (map[(int)old.x][(int)cam->origin.y] != '0')
+			cam->origin.y = old.y;
+		if (map[(int)cam->origin.x][(int)old.y] != '0')
+			cam->origin.x = old.x;
 	}
 	if (cam->origin.x > MAP_SIZE || cam->origin.x < 0)
-		cam->origin.x = new.x;
+		cam->origin.x = old.x;
 	if (cam->origin.y > MAP_SIZE || cam->origin.y < 0)
-		cam->origin.y = new.y;
+		cam->origin.y = old.y;
 }
 
 static void			sdl_keyboard(SDL_Event *event, \
