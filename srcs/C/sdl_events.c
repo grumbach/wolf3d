@@ -6,7 +6,7 @@
 /*   By: agrumbac <agrumbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/12 12:49:22 by agrumbac          #+#    #+#             */
-/*   Updated: 2018/01/30 16:03:33 by agrumbac         ###   ########.fr       */
+/*   Updated: 2018/02/01 05:17:32 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,10 @@ static void			move_cam(const char map[MAP_SIZE][MAP_SIZE], t_cam *cam, \
 
 	cam->origin.x += (a * cam->direction.x + (1 - a) * cam->plane.x) * speed;
 	cam->origin.y += (a * cam->direction.y + (1 - a) * cam->plane.y) * speed;
+	if (cam->origin.x > MAP_SIZE || cam->origin.x < 0)
+		cam->origin.x = old.x;
+	if (cam->origin.y > MAP_SIZE || cam->origin.y < 0)
+		cam->origin.y = old.y;
 	if (map[(int)cam->origin.x][(int)cam->origin.y] != '0')
 	{
 		if (map[(int)old.x][(int)cam->origin.y] != '0')
@@ -44,10 +48,6 @@ static void			move_cam(const char map[MAP_SIZE][MAP_SIZE], t_cam *cam, \
 		if (map[(int)cam->origin.x][(int)old.y] != '0')
 			cam->origin.x = old.x;
 	}
-	if (cam->origin.x > MAP_SIZE || cam->origin.x < 0)
-		cam->origin.x = old.x;
-	if (cam->origin.y > MAP_SIZE || cam->origin.y < 0)
-		cam->origin.y = old.y;
 }
 
 static void			sdl_keyboard(SDL_Event *event, \
