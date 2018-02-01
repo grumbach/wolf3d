@@ -6,7 +6,7 @@
 /*   By: angavrel <angavrel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/11/25 15:21:14 by angavrel          #+#    #+#             */
-/*   Updated: 2017/12/27 18:06:41 by Anselme          ###   ########.fr       */
+/*   Updated: 2018/02/01 01:36:10 by agrumbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ static void	draw_walls(const char map[MAP_SIZE][MAP_SIZE], SDL_Surface *minimap,
 			}
 		}
 	}
+	SDL_FreeSurface(wall);
 }
 
 void		display_minimap(t_sdl *sdl, const char map[MAP_SIZE][MAP_SIZE], \
@@ -70,4 +71,6 @@ void		display_minimap(t_sdl *sdl, const char map[MAP_SIZE][MAP_SIZE], \
 	SDL_BlitSurface(me, 0, minimap, &offset);
 	SDL_BlitSurface(minimap, 0, sdl->screen, 0);
 	SDL_UpdateWindowSurface(sdl->window);
+	SDL_FreeSurface(minimap);
+	SDL_FreeSurface(me);
 }
