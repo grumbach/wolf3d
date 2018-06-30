@@ -9,7 +9,7 @@ This project is inspired by the world-famous eponymous 90’s game, which was th
 ## Installation
 
 ```
-$> git clone https://github.com/wolf3d && cd wolf3d && git clone https://github.com/libft && make
+git clone https://github.com/grumbach/wolf3d && cd wolf3d && git clone https://github.com/grumbach/libft.git && cd libft && git checkout tags/untagged-95c691c23443fab971de && cd .. && make
 ```
 
 ## Usage
